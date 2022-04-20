@@ -1,12 +1,11 @@
 {
   "name": "gamepad-browser",
   "version": "0.0.1",
-  "type": "module",
-  "description": "Control a website navigation with a gamepad",
+   "description": "Control a website navigation with a gamepad",
   "main": "index.js",
   "scripts": {
-    "launch": "node --experimental-specifier-resolution=node ./do-launch.js",
-    "build": "node --experimental-specifier-resolution=node ./do-build.js",
+    "launch": "node ./do-launch.js",
+    "build": "node ./do-build.js",
     "lint": "./node_modules/.bin/eslint --ext .js . --fix"
   },
   "repository": {
@@ -31,7 +30,6 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsdoc": "^39.2.3",
-    "express": "^4.17.3",
     "pkg": "^5.6.0",
     "puppeteer": "^13.5.2"
   }

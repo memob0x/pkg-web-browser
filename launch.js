@@ -1,6 +1,6 @@
-import puppeteer from 'puppeteer';
-import express from 'express';
-import { resolve } from 'path';
+const puppeteer = require('puppeteer');
+
+const { readFile } = require('fs/promises');
 
 const launch = async (
   url,
@@ -13,24 +13,11 @@ const launch = async (
 
   userDataDir,
 ) => {
-  const app = express();
+  const a = await readFile(`${__dirname}/controls.css`, { encoding: 'utf8' });
 
-  app.use(express.static('.'));
+  const b = await readFile(`${__dirname}/joypads.js`, { encoding: 'utf8' });
 
-  app.use('/', (req, res) => res.sendFile(resolve('./index.html')));
-
-  let port = 0;
-
-  let address = 'http://localhost';
-
-  const server = app.listen(port, () => {
-    port = server.address().port;
-
-    address += `:${port}`;
-
-    // eslint-disable-next-line no-console
-    console.log(`Listening to port ${port}...`);
-  });
+  const c = await readFile(`${__dirname}/controls.js`, { encoding: 'utf8' });
 
   const browser = await puppeteer.launch({
     headless: false,
@@ -50,11 +37,11 @@ const launch = async (
 
   await page.waitForNavigation();
 
-  await page.addStyleTag({ url: `${address}/controls.css` });
+  await page.addStyleTag({ content: a });
 
-  await page.addScriptTag({ url: `${address}/joypads.js` });
+  await page.addScriptTag({ content: b });
 
-  await page.addScriptTag({ url: `${address}/controls.js` });
+  await page.addScriptTag({ content: c });
 };
 
-export default launch;
+module.exports = launch;

@@ -1,3 +1,19 @@
+const throttle = (func, delay) => {
+  let timeout;
+
+  return (...args) => {
+    if (!timeout) {
+      func(...args);
+
+      timeout = setTimeout(() => {
+        timeout = null;
+      }, delay);
+    }
+  };
+};
+
+const INT_TIME_MS_THROTTLE = 125;
+
 (() => {
   const {
     addEventListener,
@@ -10,20 +26,27 @@
   const classNameFocus = 'gamepad-browser-focus';
 
   const triggerTabNavigation = (index) => {
-    const items = document.querySelectorAll('a, button, input, textarea');
+    const focusableElements = document.querySelectorAll('a, button, input, textarea, [tabindex]');
+
+    const { length } = focusableElements;
+
+    const maxIndex = length - 1;
 
     currentIndex += index;
 
-    [...items].forEach((x) => x.classList.remove(classNameFocus));
+    currentIndex = currentIndex < 0 ? maxIndex : currentIndex;
+    currentIndex = currentIndex > maxIndex ? 0 : currentIndex;
 
-    const item = items[currentIndex];
+    [...focusableElements].forEach((x) => x.classList.remove(classNameFocus));
+
+    const item = focusableElements[currentIndex];
 
     item.focus();
 
     item.classList.add(classNameFocus);
   };
 
-  addEventListener('gamepadbuttonpressr1', () => triggerTabNavigation(1));
+  addEventListener('gamepadbuttonpressr1', throttle(() => triggerTabNavigation(1), INT_TIME_MS_THROTTLE));
 
-  addEventListener('gamepadbuttonpressl1', () => triggerTabNavigation(-1));
+  addEventListener('gamepadbuttonpressl1', throttle(() => triggerTabNavigation(-1), INT_TIME_MS_THROTTLE));
 })();

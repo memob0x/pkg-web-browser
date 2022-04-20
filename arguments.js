@@ -1,4 +1,4 @@
-import argv from 'argv';
+const argv = require('argv');
 
 const { options } = argv.option([
   {
@@ -69,7 +69,7 @@ const {
   output = 'test.exe',
 } = options || {};
 
-export {
+module.exports = {
   url,
 
   width,

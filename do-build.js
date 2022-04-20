@@ -1,8 +1,8 @@
-import { exec } from 'pkg';
+const { exec } = require('pkg');
 
-import { writeFile, unlink } from 'fs/promises';
+const { writeFile } = require('fs/promises');
 
-import {
+const {
   url,
 
   width,
@@ -16,17 +16,42 @@ import {
   target,
 
   output,
-} from './arguments';
+} = require('./arguments');
 
 (async () => {
   try {
-    await writeFile('runtime.js', `import launch from "./launch.js"; launch(${url}, ${width}, ${height}, ${browser}, ${data})`);
+    await writeFile(`${__dirname}/runtime.json`, JSON.stringify({
+      url,
 
-    await exec(['runtime.js', '--target', target, '--output', output]);
+      width,
+
+      height,
+
+      browser,
+
+      data,
+
+      target,
+
+      output,
+    }));
+
+    await exec([
+      'runtime.js',
+      '--config',
+      'config.json',
+      '--compress',
+      'GZip',
+      '--no-native-build',
+      '--target',
+      target,
+      '--output',
+      output,
+    ]);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error(e);
-  } finally {
-    await unlink('runtime.js');
-  }
+  } // finally {
+  // await unlink('runtime.json');
+  // }
 })();

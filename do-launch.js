@@ -1,5 +1,15 @@
-import { url, width, height } from './arguments';
+const {
+  url,
 
-import launch from './launch';
+  width,
 
-launch(url, width, height);
+  height,
+
+  browser,
+
+  data,
+} = require('./arguments');
+
+const launch = require('./launch');
+
+launch(url, width, height, browser, data);
