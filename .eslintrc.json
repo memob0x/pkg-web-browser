@@ -1,0 +1,31 @@
+{
+    "env": {
+      "node": true,
+      "es2021": true
+    },
+    "extends": [
+      "airbnb-base"
+    ],
+    "plugins": [
+      "jsdoc"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 13,
+      "sourceType": "module"
+    },
+    "rules": {
+    },
+    "overrides": [
+      {
+        "files": [
+          "*.spec.js"
+        ],
+        "env": {
+          "mocha": true
+        },
+        "rules": {
+          "no-unused-expressions": "off"
+        }
+      } 
+    ]
+  }
