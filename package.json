@@ -1,5 +1,5 @@
 {
-  "name": "gamepad-browser",
+  "name": "pkg-website-gamepad",
   "version": "0.0.1",
    "description": "Control a website navigation with a gamepad",
   "main": "index.js",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/memob0x/gamepad-browser"
+    "url": "github.com/memob0x/pkg-website-gamepad"
   },
   "keywords": [
     "gamepad",
