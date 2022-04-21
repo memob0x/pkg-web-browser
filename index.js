@@ -1,3 +1,7 @@
+const { exec } = require('pkg');
+
+const { writeFile, unlink } = require('fs/promises');
+
 const argv = require('argv');
 
 const { options } = argv.option([
@@ -69,18 +73,39 @@ const {
   output = 'test.exe',
 } = options || {};
 
-module.exports = {
-  url,
+(async () => {
+  await writeFile(`${__dirname}/runtime.json`, JSON.stringify({
+    url,
 
-  width,
+    width,
 
-  height,
+    height,
 
-  browser,
+    browser,
 
-  data,
+    data,
 
-  target,
+    target,
 
-  output,
-};
+    output,
+  }));
+
+  try {
+    await exec([
+      './runtime.js',
+      '--config',
+      './config.json',
+      '--compress',
+      'GZip',
+      '--target',
+      target,
+      '--output',
+      output,
+    ]);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
+  }
+
+  await unlink(`${__dirname}/runtime.json`);
+})();

@@ -1,0 +1,24 @@
+.gamepad-browser-focus {
+    outline: 6px solid blue!important;
+}
+
+.gamepad-browser-cursor {
+    border-radius: 100%;
+    background: rgba(0, 162, 255, 0.2);
+    position: fixed;
+    top: var(--cursor-top);
+    left: var(--cursor-left);
+    transition: transform .8s ease;
+    transform: scale(0);
+    width: 210px; 
+}
+
+.gamepad-browser-cursor::after {
+    content: '';
+    display: block;
+    padding-bottom: 100%;
+}
+
+.gamepad-browser-cursor--active {
+    transform: scale(1)
+}

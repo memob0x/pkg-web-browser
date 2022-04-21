@@ -1,9 +1,9 @@
-const { readFile } = require('fs/promises');
+const launch = require('./src/launch');
 
-const launch = require('./launch');
+const read = require('./src/read');
 
 (async () => {
-  const runtimeConfigFile = await readFile(`${__dirname}/runtime.json`, { encoding: 'utf8' });
+  const runtimeConfigFile = await read(`${__dirname}/runtime.json`);
 
   const runtimeConfig = JSON.parse(runtimeConfigFile);
 

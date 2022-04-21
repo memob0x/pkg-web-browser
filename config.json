@@ -1,3 +1,6 @@
 {
-    "assets": ["runtime.json", "controls.css", "index.html", "joypads.js", "controls.js"]
+    "assets": [
+        "src/injected/*",
+        "runtime.json"
+    ]
 }
