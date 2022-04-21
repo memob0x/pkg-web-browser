@@ -29,7 +29,17 @@ const INT_TIME_MS_THROTTLE = 250;
 
   let focusedItem = null;
 
-  const eee = () => [...document.querySelectorAll('a, button, input, textarea, [role="button"]:not(a)')];
+  const tags = 'a, button, input, textarea';
+
+  const eee = () => {
+    const a = [...document.querySelectorAll(`${tags}, [role="button"]:not(${tags})`)];
+
+    const b = a.filter((x) => !x.matches('[tabindex="-1"]'));
+
+    const c = b.filter((x) => !!x.closest('[tabindex="-1"]'));
+
+    return c.length ? c : b;
+  };
 
   const triggerFocus = (x) => {
     const former = [...document.querySelectorAll(`.${classNameFocus}`)];

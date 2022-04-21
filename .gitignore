@@ -3,3 +3,4 @@ chrome*
 *.exe
 runtime.json
 *.html
+_*.sh
