@@ -11,6 +11,7 @@
     transition: transform .8s ease;
     transform: scale(0);
     width: 210px; 
+    z-index: 99999;
 }
 
 .gamepad-browser-cursor::after {

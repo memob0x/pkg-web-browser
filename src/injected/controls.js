@@ -27,10 +27,24 @@ const INT_TIME_MS_THROTTLE = 250;
 
   const classNameFocus = 'gamepad-browser-focus';
 
-  const eee = () => [...document.querySelectorAll('a, button, input, textarea, [tabindex]')];
+  let focusedItem = null;
+
+  const eee = () => [...document.querySelectorAll('a, button, input, textarea, [role="button"]:not(a)')];
 
   const triggerFocus = (x) => {
-    currentIndex = eee().findIndex((y) => x === y);
+    const former = [...document.querySelectorAll(`.${classNameFocus}`)];
+
+    if (former.length) {
+      former.forEach((y) => y.classList.remove(classNameFocus));
+    }
+
+    const items = eee();
+
+    currentIndex = items.findIndex((y) => x.isEqualNode(y));
+
+    focusedItem = items.find((y) => x.isEqualNode(y));
+
+    focusedItem.classList.add(classNameFocus);
 
     return x && x.focus();
   };
@@ -47,13 +61,9 @@ const INT_TIME_MS_THROTTLE = 250;
     currentIndex = currentIndex < 0 ? maxIndex : currentIndex;
     currentIndex = currentIndex > maxIndex ? 0 : currentIndex;
 
-    [...focusableElements].forEach((x) => x.classList.remove(classNameFocus));
-
     const item = focusableElements[currentIndex];
 
     triggerFocus(item);
-
-    item.classList.add(classNameFocus);
   };
 
   const scroll = (factor) => {
@@ -164,7 +174,11 @@ const INT_TIME_MS_THROTTLE = 250;
 
   addEventListener('gamepad:buttonpress:l2', throttle(() => scroll(-1), INT_TIME_MS_THROTTLE));
 
-  const triggerClickOnFocusElement = () => document.activeElement.click();
+  const triggerClickOnFocusElement = () => {
+    if (focusedItem) {
+      focusedItem.click();
+    }
+  };
 
   addEventListener('gamepad:buttonpress:abxy', throttle(() => {
     if (ccc()) {
