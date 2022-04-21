@@ -12,6 +12,8 @@ const launch = async (
   executablePath,
 
   userDataDir,
+
+  kiosk,
 ) => {
   const [css, js1, js2] = await Promise.all([
     read(`${__dirname}/injected/controls.css`),
@@ -20,6 +22,16 @@ const launch = async (
 
     read(`${__dirname}/injected/controls.js`),
   ]);
+
+  const args = [
+    `--app=${url}`,
+
+    '--new-window',
+  ];
+
+  if (kiosk) {
+    args.push('--kiosk');
+  }
 
   const browser = await puppeteer.launch({
     headless: false,
@@ -32,13 +44,7 @@ const launch = async (
       '--enable-automation',
     ],
 
-    args: [
-      `--app=${url}`,
-
-      '--kiosk',
-
-      '--new-window',
-    ],
+    args,
   });
 
   const [page] = await browser.pages();

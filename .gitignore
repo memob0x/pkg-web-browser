@@ -4,3 +4,4 @@ chrome*
 runtime.json
 *.html
 _*.sh
+runtime

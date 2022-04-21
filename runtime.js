@@ -16,8 +16,10 @@ const read = require('./src/read');
 
     browser,
 
-    data,
+    profile,
+
+    kiosk,
   } = runtimeConfig;
 
-  await launch(url, width, height, browser, data);
+  await launch(url, width, height, browser, profile, kiosk);
 })();

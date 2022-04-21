@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "node ./index.js",
+    "test": "",
     "lint": "./node_modules/.bin/eslint --ext .js . --fix",
     "prepare": "husky install"
   },
@@ -18,6 +19,10 @@
   "keywords": [
     "gamepad",
     "browser",
+    "pkg",
+    "executable",
+    "bundle",
+    "build",
     "kiosk",
     "chrome",
     "controller"
