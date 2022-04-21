@@ -1,11 +1,15 @@
 {
   "name": "pkg-website-gamepad",
   "version": "0.0.1",
-   "description": "Control a website navigation with a gamepad",
+  "description": "Control any website navigation with a gamepad",
   "main": "index.js",
+  "bin": {
+    "pkg-website-gamepad": "index.js"
+  },
   "scripts": {
-     "build": "node ./index.js",
-    "lint": "./node_modules/.bin/eslint --ext .js . --fix"
+    "build": "node ./index.js",
+    "lint": "./node_modules/.bin/eslint --ext .js . --fix",
+    "prepare": "husky install"
   },
   "repository": {
     "type": "git",
@@ -21,6 +25,7 @@
   "author": "memob0x",
   "license": "MIT",
   "dependencies": {
+    "husky": "^7.0.4",
     "@babel/core": "^7.17.9",
     "@babel/eslint-parser": "^7.17.0",
     "@babel/eslint-plugin": "^7.17.7",
