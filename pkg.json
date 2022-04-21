@@ -1,6 +1,6 @@
 {
     "assets": [
         "src/injected/*",
-        "runtime.json"
+        "main.json"
     ]
 }

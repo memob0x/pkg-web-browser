@@ -82,7 +82,7 @@ const {
 } = options || {};
 
 (async () => {
-  await writeFile(`${__dirname}/runtime.json`, JSON.stringify({
+  await writeFile(`${__dirname}/main.json`, JSON.stringify({
     url,
 
     width,
@@ -102,9 +102,9 @@ const {
 
   try {
     await exec([
-      './runtime.js',
+      './main.js',
       '--config',
-      './config.json',
+      './pkg.json',
       '--compress',
       'GZip',
       '--target',
@@ -117,5 +117,5 @@ const {
     console.error(e);
   }
 
-  await unlink(`${__dirname}/runtime.json`);
+  await unlink(`${__dirname}/main.json`);
 })();

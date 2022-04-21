@@ -31,6 +31,14 @@ const INT_TIME_MS_THROTTLE = 250;
 
   const tags = 'a, button, input, textarea';
 
+  const areNodesEqual = (a, b) => {
+    if (!a || !b) {
+      return false;
+    }
+
+    return a.isEqualNode(b);
+  };
+
   const eee = () => {
     const a = [...document.querySelectorAll(`${tags}, [role="button"]:not(${tags})`)];
 
@@ -50,9 +58,9 @@ const INT_TIME_MS_THROTTLE = 250;
 
     const items = eee();
 
-    currentIndex = items.findIndex((y) => x.isEqualNode(y));
+    currentIndex = items.findIndex((y) => areNodesEqual(x, y));
 
-    focusedItem = items.find((y) => x.isEqualNode(y));
+    focusedItem = items.find((y) => areNodesEqual(x, y));
 
     focusedItem.classList.add(classNameFocus);
 
