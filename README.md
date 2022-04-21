@@ -1,6 +1,6 @@
 # pkg-website-gamepad
 
-[![Build Status](https://github.com/memob0x/pkg-website-gamepad/actions/workflows/ci.yml/badge.svg)](https://github.com/memob0x/pkg-website-gamepad/actions/workflows/ci.yml)
+![Node.js CI](https://github.com/memob0x/pkg-website-gamepad/workflows/Node.js%20CI/badge.svg)
 
 Bundle a public website and control it with a gamepad.
 
