@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "node ./index.js",
+    "launch": "node ./main.js",
     "test": "",
     "lint": "./node_modules/.bin/eslint --ext .js . --fix",
     "prepare": "husky install"

@@ -104,12 +104,20 @@
         dispatchEvent(new CustomEvent('gamepad:buttonpress:analog', { detail }));
       }
 
+      if (type.endsWith('1')) {
+        dispatchEvent(new CustomEvent('gamepad:buttonpress:shoulder', { detail }));
+      }
+
+      if (type.endsWith('2')) {
+        dispatchEvent(new CustomEvent('gamepad:buttonpress:trigger', { detail }));
+      }
+
       dispatchEvent(new CustomEvent(`gamepad:buttonpress:${type}`, { detail }));
     });
 
     const [lx, ly, rx, ry] = axes;
 
-    const round = (x) => Math.round(x * 10) / 10;
+    const roundDecimals = (x, p) => Math.round(x * p) / p;
 
     [
       [lx, ly],
@@ -119,9 +127,9 @@
       const type = !analogIndex ? 'left' : 'right';
 
       const analog = [
-        round(analogRaw[0]),
+        roundDecimals(analogRaw[0], 10),
 
-        round(analogRaw[1]),
+        roundDecimals(analogRaw[1], 10),
       ];
 
       if (`${state[type]}` === `${analog}`) {
