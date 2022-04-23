@@ -2,7 +2,7 @@
 
 ![Node.js CI](https://github.com/memob0x/pkg-website-gamepad/workflows/Node.js%20CI/badge.svg)
 
-Bundle a public website and control it with a gamepad, handy for media centers or presentations.
+Bundle a website and control it with a gamepad, handy for media centers, presentations or accessibility assessments.
 
 ## Usage
 
@@ -29,7 +29,7 @@ pkg-website-gamepad [options]
 
   Examples:
 
-  – Makes an executable for current the architecture
+  – Makes an executable for the current architecture
     $ pkg-website-gamepad -u "https://website.com"
   - Makes an executable for windows
     $ pkg-website-gamepad -t node16-win-x64 -u "https://website.com"
