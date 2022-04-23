@@ -2,7 +2,7 @@
 
 [![Build Status](https://github.com/memob0x/pkg-website-gamepad/actions/workflows/ci.yml/badge.svg)](https://github.com/memob0x/pkg-website-gamepad/actions/workflows/ci.yml)
 
-Bundle a public website and control it with a gamepad.
+Bundle a public website and control it with a gamepad, handy for media centers or presentations.
 
 ## Usage
 
@@ -21,15 +21,15 @@ pkg-website-gamepad [options]
     -u, --url             defines the opened website url
     -vw, --width          defines the opened website viewport width
     -vh, --height         defines the opened website viewport height
-    -b, --browser         defines the used browser path
-    -p, --profile         defines the used browser path
+    -b, --browser         defines the used browser executable path
+    -p, --profile         defines the used browser profile directory path
     -t, --target          defines the final program architecture
     -o, --output          defines the final program output file
     -k, --kiosk           defines whether the final program should open in kiosk mode or not
 
   Examples:
 
-  – Makes an executable for current architecture
+  – Makes an executable for current the architecture
     $ pkg-website-gamepad -u "https://website.com"
   - Makes an executable for windows
     $ pkg-website-gamepad -t node16-win-x64 -u "https://website.com"
