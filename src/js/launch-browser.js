@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const hasPageInjectedResources = require('./has-page-injected-resources');
 const injectPageResources = require('./inject-page-resources');
+const sleep = require('./sleep');
 
 const launchBrowser = async (
   url,
@@ -14,6 +15,10 @@ const launchBrowser = async (
   userDataDir,
 
   shouldOpenInKiosk,
+
+  css,
+
+  js,
 ) => {
   const args = [
     `--app=${url}`,
@@ -48,16 +53,25 @@ const launchBrowser = async (
   // TODO: check, maybe replace polling with a cleaner approach in order to support live reloads
   const pollPageResourcesInjection = async () => {
     try {
-      const ok = await hasPageInjectedResources();
+      const ok = await hasPageInjectedResources(page);
 
       if (!ok) {
-        injectPageResources();
+        await injectPageResources(page, css, js);
       }
-    } catch (e) {
-      //
+    } catch ({ message }) {
+      // NOTE: "Execution context was destroyed, most likely because of a navigation."
+      // error is raised by page reload...
+      if (message.indexOf('Execution context was destroyed') < -1) {
+        // ...any other error would cause the browser to close
+        await page.close();
+
+        return;
+      }
     }
 
     await pollPageResourcesInjection();
+
+    await sleep(500);
   };
 
   await pollPageResourcesInjection();

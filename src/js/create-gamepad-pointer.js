@@ -1,4 +1,4 @@
-const createGamepadPointer = (client = this) => {
+const createGamepadPointer = (client) => {
   const {
     addEventListener,
 
@@ -9,7 +9,7 @@ const createGamepadPointer = (client = this) => {
     CustomEvent,
 
     document,
-  } = client;
+  } = client || {};
 
   const pointer = document.createElement('div');
 

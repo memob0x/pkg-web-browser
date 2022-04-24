@@ -1,8 +1,8 @@
 const sass = require('node-sass');
 
-const transpileScss = (data) => new Promise((resolve, reject) => {
+const transpileScss = (file) => new Promise((resolve, reject) => {
   sass.render({
-    data,
+    file,
 
     outputStyle: 'compressed',
   }, (error, result) => {

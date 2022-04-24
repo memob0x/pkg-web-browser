@@ -6,8 +6,8 @@ const scroll = (el, factor) => {
   });
 };
 
-const createGamepadScroller = (client = this) => {
-  const { addEventListener, removeEventListener, document } = client;
+const createGamepadScroller = (client) => {
+  const { addEventListener, removeEventListener, document } = client || {};
 
   const { documentElement } = document;
 

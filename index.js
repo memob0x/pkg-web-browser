@@ -3,6 +3,7 @@ const argv = require('argv');
 const { exec } = require('pkg');
 
 const { writeFile, unlink } = require('fs/promises');
+const readFileUtf8 = require('./src/js/read-file-utf8');
 
 const { options } = argv.option([
   {
@@ -81,28 +82,34 @@ const {
   kiosk,
 } = options || {};
 
-const singleQuoteTruthyString = (str) => (str ? `'${str}'` : str);
-
 (async () => {
   const runtimeFilename = `runtime-${Date.now()}.js`;
 
   const runtimeFile = `${__dirname}/${runtimeFilename}`;
 
+  const runtimeCssCodeToBeInjected = await readFileUtf8('./dist/style.css');
+
+  const runtimeJsCodeToBeInjected = await readFileUtf8('./dist/scripts.js');
+
   await writeFile(
     runtimeFile,
 
     `require('./src/js/launch-browser')(
-      ${singleQuoteTruthyString(url)},
+      ${JSON.stringify(url)},
       
       ${width},
       
       ${height},
       
-      ${singleQuoteTruthyString(browser)},
+      ${JSON.stringify(browser)},
       
-      ${singleQuoteTruthyString(profile)},
+      ${JSON.stringify(profile)},
       
       ${kiosk},
+
+      ${JSON.stringify(runtimeCssCodeToBeInjected)},
+
+      ${JSON.stringify(runtimeJsCodeToBeInjected)},
     );`,
   );
 

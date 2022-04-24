@@ -21,7 +21,7 @@ const buttonNames = {
   15: 'dpadright',
 };
 
-const createGamepadSupport = (client = this) => {
+const createGamepadSupport = (client) => {
   const {
     navigator,
 
@@ -34,7 +34,7 @@ const createGamepadSupport = (client = this) => {
     dispatchEvent,
 
     CustomEvent,
-  } = client;
+  } = client || {};
 
   const { getGamepads } = navigator;
 
