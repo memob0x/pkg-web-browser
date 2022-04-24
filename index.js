@@ -10,7 +10,7 @@ const { options } = argv.option([
     short: 'u',
     type: 'string',
     description: 'Defines the opened website url',
-    example: "'script --url=http://google.com' or 'script -u http://google.com'",
+    example: "'script --url=//website.org' or 'script -u //website.org'",
   },
   {
     name: 'width',
@@ -81,24 +81,26 @@ const {
   kiosk,
 } = options || {};
 
-const wrapTruthyString = (str) => (str ? `'${str}'` : str);
+const singleQuoteTruthyString = (str) => (str ? `'${str}'` : str);
 
 (async () => {
-  const name = `runtime-${Date.now()}`;
+  const runtimeFilename = `runtime-${Date.now()}.js`;
+
+  const runtimeFile = `${__dirname}/${runtimeFilename}`;
 
   await writeFile(
-    `${__dirname}/${name}.js`,
+    runtimeFile,
 
     `require('./src/js/launch-browser')(
-      ${wrapTruthyString(url)},
+      ${singleQuoteTruthyString(url)},
       
       ${width},
       
       ${height},
       
-      ${wrapTruthyString(browser)},
+      ${singleQuoteTruthyString(browser)},
       
-      ${wrapTruthyString(profile)},
+      ${singleQuoteTruthyString(profile)},
       
       ${kiosk},
     );`,
@@ -106,7 +108,7 @@ const wrapTruthyString = (str) => (str ? `'${str}'` : str);
 
   try {
     await exec([
-      `./${name}.js`,
+      `./${runtimeFilename}`,
 
       '--config',
       './pkg.json',
@@ -125,5 +127,5 @@ const wrapTruthyString = (str) => (str ? `'${str}'` : str);
     console.error(e);
   }
 
-  await unlink(`${__dirname}/${name}.js`);
+  await unlink(runtimeFile);
 })();
