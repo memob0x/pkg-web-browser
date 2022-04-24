@@ -83,7 +83,7 @@ const {
 } = options || {};
 
 (async () => {
-  const runtimeFilename = `runtime-${Date.now()}.js`;
+  const runtimeFilename = `runtime-${performance.now()}.js`;
 
   const runtimeFile = `${__dirname}/${runtimeFilename}`;
 

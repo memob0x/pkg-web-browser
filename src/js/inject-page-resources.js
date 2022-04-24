@@ -1,7 +1,6 @@
 const throttle = require('./throttle');
 const triggerPageTabNavigation = require('./trigger-page-tab-navigation');
-const triggerHandledElementEvent = require('./trigger-handled-element-event');
-const triggerHandledElementUnderBoundingRectHoverFocus = require('./trigger-handled-element-under-bounding-rect-hover-focus');
+const getHandledElementUnderBoundingRect = require('./get-handled-element-under-bounding-rect');
 
 const {
   INT_MS_THROTTLE_DELAY,
@@ -23,13 +22,21 @@ const injectPageResources = (page, css, js) => Promise.all([
   )),
 
   page.exposeFunction('triggerHandledActiveElementClick', throttle(
-    () => triggerHandledElementEvent(page, '*:focus', 'click'),
+    async () => {
+      const element = await page.$('*:focus');
+
+      await element.click();
+    },
 
     INT_MS_THROTTLE_DELAY,
   )),
 
   page.exposeFunction('triggerHandledElementUnderBoundingRectHoverFocus', throttle(
-    (boundingRect) => triggerHandledElementUnderBoundingRectHoverFocus(page, boundingRect),
+    async (boundingRect) => {
+      const closestElement = await getHandledElementUnderBoundingRect(page, boundingRect);
+
+      await closestElement.focus();
+    },
 
     INT_MS_THROTTLE_DELAY,
   )),
