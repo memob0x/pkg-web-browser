@@ -1,6 +1,7 @@
 {
-    "assets": [
-        "src/*",
-        "main.json"
-    ]
+  "assets": [
+    "dist/style.css",
+    "dist/scripts.js",
+    "runtime-*.js"
+  ]
 }
