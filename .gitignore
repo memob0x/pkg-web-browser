@@ -1,7 +1,3 @@
 node_modules
 chrome*
-*.exe
-main.json
-*.html
-_*.sh
-main
+runtime*

@@ -1,4 +1,27 @@
-(() => {
+const buttonNames = {
+  0: 'b',
+  1: 'a',
+  2: 'y',
+  3: 'x',
+
+  4: 'l1',
+  5: 'r1',
+  6: 'l2',
+  7: 'r2',
+
+  8: 'select',
+  9: 'start',
+
+  10: 'analogleft',
+  11: 'analogright',
+
+  12: 'dpadtop',
+  13: 'dpaddown',
+  14: 'dpadleft',
+  15: 'dpadright',
+};
+
+const createGamepadSupport = (client = this) => {
   const {
     navigator,
 
@@ -6,37 +29,16 @@
 
     addEventListener,
 
+    removeEventListener,
+
     dispatchEvent,
 
     CustomEvent,
-  } = globalThis;
+  } = client;
 
   const { getGamepads } = navigator;
 
   const padsCollection = {};
-
-  const buttonNames = {
-    0: 'b',
-    1: 'a',
-    2: 'y',
-    3: 'x',
-
-    4: 'l1',
-    5: 'r1',
-    6: 'l2',
-    7: 'r2',
-
-    8: 'select',
-    9: 'start',
-
-    10: 'analogleft',
-    11: 'analogright',
-
-    12: 'dpadtop',
-    13: 'dpaddown',
-    14: 'dpadleft',
-    15: 'dpadright',
-  };
 
   const indexExists = (index) => !!padsCollection[index];
 
@@ -146,7 +148,13 @@
     });
   });
 
+  let hasBeenDestroyed = false;
+
   const loopIteration = () => {
+    if (hasBeenDestroyed) {
+      return;
+    }
+
     scanPads();
 
     parseButtons();
@@ -156,7 +164,23 @@
 
   loopIteration();
 
-  addEventListener('gamepadconnected', ({ gamepad }) => possiblyAddPad(gamepad));
+  const gamepadConnectedHandler = ({ gamepad }) => possiblyAddPad(gamepad);
 
-  addEventListener('gamepaddisconnected', ({ gamepad }) => possiblyRemovePad(gamepad));
-})();
+  const gamepadDisconnectedHandler = ({ gamepad }) => possiblyRemovePad(gamepad);
+
+  addEventListener('gamepadconnected', gamepadConnectedHandler);
+
+  addEventListener('gamepaddisconnected', gamepadDisconnectedHandler);
+
+  const destroy = () => {
+    hasBeenDestroyed = true;
+
+    removeEventListener('gamepadconnected', gamepadConnectedHandler);
+
+    removeEventListener('gamepaddisconnected', gamepadDisconnectedHandler);
+  };
+
+  return destroy;
+};
+
+module.exports = createGamepadSupport;

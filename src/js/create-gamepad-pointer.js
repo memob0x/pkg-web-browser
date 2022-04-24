@@ -1,12 +1,16 @@
-(({
-  addEventListener,
+const createGamepadPointer = (client = this) => {
+  const {
+    addEventListener,
 
-  dispatchEvent,
+    removeEventListener,
 
-  CustomEvent,
+    dispatchEvent,
 
-  document,
-}) => {
+    CustomEvent,
+
+    document,
+  } = client;
+
   const pointer = document.createElement('div');
 
   const { classList: pointerCssClassList } = pointer;
@@ -46,7 +50,7 @@
 
   const isPointerActive = () => pointerCssClassList.contains('gamepad-pointer--active');
 
-  addEventListener('gamepad:buttonpress:analog', () => {
+  const gamepadButtonpressAnalogHandler = () => {
     if (shouldThrottleAnalogButtonPress) {
       return;
     }
@@ -66,9 +70,9 @@
     }
 
     activatePointer();
-  });
+  };
 
-  addEventListener('gamepad:analogmove', ({ detail }) => {
+  const gamepadAnalogMoveHandler = ({ detail }) => {
     if (!isPointerActive()) {
       return;
     }
@@ -86,5 +90,19 @@
     style.setProperty('--gamepad-pointer-top', `${top}px`);
 
     activatePointer();
-  });
-})(globalThis);
+  };
+
+  addEventListener('gamepad:buttonpress:analog', gamepadButtonpressAnalogHandler);
+
+  addEventListener('gamepad:analogmove', gamepadAnalogMoveHandler);
+
+  const destroy = () => {
+    removeEventListener('gamepad:buttonpress:analog', gamepadButtonpressAnalogHandler);
+
+    removeEventListener('gamepad:analogmove', gamepadAnalogMoveHandler);
+  };
+
+  return destroy;
+};
+
+module.exports = createGamepadPointer;

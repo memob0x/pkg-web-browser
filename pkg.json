@@ -1,6 +1,5 @@
 {
-    "assets": [
-        "src/*",
-        "main.json"
-    ]
+  "assets": [
+    "src/**/*"
+  ]
 }
