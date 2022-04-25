@@ -9,6 +9,7 @@ const log = (type, ...args) => {
     return;
   }
 
+  // eslint-disable-next-line no-console
   console[type](...args);
 };
 

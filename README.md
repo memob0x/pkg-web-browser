@@ -23,8 +23,8 @@ pkg-website-gamepad [options]
     --pkg-target                defines the final program architecture
     --browser-executable-path   defines the used browser executable path
     --browser-user-data-dir     defines the used browser profile directory path
-    --viewport-width            defines the opened website viewport width
-    --viewport-height           defines the opened website viewport height
+    --browser-viewport-width    defines the opened website viewport width
+    --browser-viewport-height   defines the opened website viewport height
     --browser-window-mode       defines whether the final program should open in kiosk mode or in other supported mode
 
   Examples:

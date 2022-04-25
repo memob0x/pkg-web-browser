@@ -8,16 +8,16 @@ const log = require('./src/js/log');
 
 const { options, targets } = argv.option([
   {
-    name: 'viewport-width',
+    name: 'browser-viewport-width',
     type: 'int',
     description: 'Defines the opened website viewport viewport-width',
-    example: "'pkg-browser-gamepad --viewport-width=720'",
+    example: "'pkg-browser-gamepad --browser-viewport-width=720'",
   },
   {
-    name: 'viewport-height',
+    name: 'browser-viewport-height',
     type: 'int',
     description: 'Defines the opened website viewport viewport-height',
-    example: "'pkg-browser-gamepad --viewport-height=576'",
+    example: "'pkg-browser-gamepad --browser-viewport-height=576'",
   },
   {
     name: 'browser-executable-path',
@@ -32,16 +32,16 @@ const { options, targets } = argv.option([
     example: "'pkg-browser-gamepad --browser-user-data-dir=/home/user/.config/chromium/Default'",
   },
   {
-    name: 'pkg-target',
-    type: 'string',
-    description: 'Defines the final program architecture',
-    example: "'pkg-browser-gamepad --pkg-target=node16-macos-x64'",
-  },
-  {
     name: 'browser-window-mode',
     type: 'string',
     description: 'Defines whether the final program should open in kiosk mode or other modes',
     example: "'pkg-browser-gamepad --browser-window-mode=kiosk'",
+  },
+  {
+    name: 'pkg-target',
+    type: 'string',
+    description: 'Defines the final program architecture',
+    example: "'pkg-browser-gamepad --pkg-target=node16-macos-x64'",
   },
 ]).run();
 
@@ -50,13 +50,13 @@ const {
 
   'browser-user-data-dir': browserUserDataDir,
 
-  'viewport-width': viewportWidth = 1920,
+  'browser-viewport-width': viewportWidth = 1920,
 
-  'viewport-height': viewportHeight = 1080,
-
-  'pkg-target': pkgTarget = 'host',
+  'browser-viewport-height': viewportHeight = 1080,
 
   'browser-window-mode': browserWindowMode = 'kiosk',
+
+  'pkg-target': pkgTarget = 'host',
 } = options || {};
 
 const [
