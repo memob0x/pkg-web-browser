@@ -1,3 +1,5 @@
+const roundDecimals = require('./round-decimals');
+
 const buttonNames = {
   0: 'b',
   1: 'a',
@@ -81,52 +83,32 @@ const createGamepadSupport = (client) => {
       axes = [],
     } = gamepad;
 
-    buttons.forEach((button, buttonIndex) => {
-      const { pressed, touched } = button || {};
+    if (buttons.some((x) => x.pressed || x.touched)) {
+      const detail = buttons.reduce((accumulator, { value, pressed, touched }, buttonIndex) => {
+        const name = buttonNames[buttonIndex];
 
-      const type = buttonNames[buttonIndex];
+        if (!name) {
+          return accumulator;
+        }
 
-      if (!type || (!pressed && !touched)) {
-        return;
-      }
+        const button = { value, pressed, touched };
 
-      const detail = { type };
+        accumulator.push({ name, button });
 
-      dispatchEvent(new CustomEvent('gamepad:buttonpress', { detail }));
+        return accumulator;
+      }, []);
 
-      if (type === 'a' || type === 'b' || type === 'x' || type === 'y') {
-        dispatchEvent(new CustomEvent('gamepad:buttonpress:abxy', { detail }));
-      }
-
-      if (type.startsWith('dpad')) {
-        dispatchEvent(new CustomEvent('gamepad:buttonpress:dpad', { detail }));
-      }
-
-      if (type.startsWith('analog')) {
-        dispatchEvent(new CustomEvent('gamepad:buttonpress:analog', { detail }));
-      }
-
-      if (type.endsWith('1')) {
-        dispatchEvent(new CustomEvent('gamepad:buttonpress:shoulder', { detail }));
-      }
-
-      if (type.endsWith('2')) {
-        dispatchEvent(new CustomEvent('gamepad:buttonpress:trigger', { detail }));
-      }
-
-      dispatchEvent(new CustomEvent(`gamepad:buttonpress:${type}`, { detail }));
-    });
+      dispatchEvent(new CustomEvent('gamepadbuttonpress', { detail }));
+    }
 
     const [lx, ly, rx, ry] = axes;
-
-    const roundDecimals = (x, p) => Math.round(x * p) / p;
 
     [
       [lx, ly],
 
       [rx, ry],
     ].forEach((analogRaw, analogIndex) => {
-      const type = !analogIndex ? 'left' : 'right';
+      const name = !analogIndex ? 'left' : 'right';
 
       const analog = [
         roundDecimals(analogRaw[0], 10),
@@ -134,17 +116,15 @@ const createGamepadSupport = (client) => {
         roundDecimals(analogRaw[1], 10),
       ];
 
-      if (`${state[type]}` === `${analog}`) {
+      if (`${state[name]}` === `${analog}`) {
         return;
       }
 
-      state[type] = analog;
+      state[name] = analog;
 
-      const detail = { type, analog };
+      const detail = { name, analog };
 
-      dispatchEvent(new CustomEvent('gamepad:analogmove', { detail }));
-
-      dispatchEvent(new CustomEvent(`gamepad:analogmove:${type}`, { detail }));
+      dispatchEvent(new CustomEvent('gamepadanalogmove', { detail }));
     });
   });
 

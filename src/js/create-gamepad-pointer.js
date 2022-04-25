@@ -1,3 +1,7 @@
+const { INT_MS_THROTTLE_DELAY } = require('./constants');
+const hasButtonPressed = require('./has-button-pressed');
+const throttle = require('./throttle');
+
 const createGamepadPointer = (client) => {
   const {
     addEventListener,
@@ -21,8 +25,6 @@ const createGamepadPointer = (client) => {
 
   let left = 0;
   let top = 0;
-
-  let shouldThrottleAnalogButtonPress = false;
 
   const deactivatePointer = () => {
     clearTimeout(pointerDeactivationTimeout);
@@ -50,19 +52,13 @@ const createGamepadPointer = (client) => {
 
   const isPointerActive = () => pointerCssClassList.contains('gamepad-pointer--active');
 
-  const gamepadButtonpressAnalogHandler = () => {
-    if (shouldThrottleAnalogButtonPress) {
+  const gamepadButtonpressAnalogHandler = throttle(({ detail }) => {
+    if (!hasButtonPressed(detail, 'analogleft') && !hasButtonPressed(detail, 'analogright')) {
       return;
     }
 
-    shouldThrottleAnalogButtonPress = true;
-
-    setTimeout(() => {
-      shouldThrottleAnalogButtonPress = false;
-    }, 250);
-
     if (isPointerActive()) {
-      dispatchEvent(new CustomEvent('gamepad:pointer:selection', { detail: pointer.getBoundingClientRect() }));
+      dispatchEvent(new CustomEvent('gamepadpointerselection', { detail: pointer.getBoundingClientRect() }));
 
       deactivatePointer();
 
@@ -70,7 +66,7 @@ const createGamepadPointer = (client) => {
     }
 
     activatePointer();
-  };
+  }, INT_MS_THROTTLE_DELAY);
 
   const gamepadAnalogMoveHandler = ({ detail }) => {
     if (!isPointerActive()) {
@@ -92,14 +88,14 @@ const createGamepadPointer = (client) => {
     activatePointer();
   };
 
-  addEventListener('gamepad:buttonpress:analog', gamepadButtonpressAnalogHandler);
+  addEventListener('gamepadbuttonpress', gamepadButtonpressAnalogHandler);
 
-  addEventListener('gamepad:analogmove', gamepadAnalogMoveHandler);
+  addEventListener('gamepadanalogmove', gamepadAnalogMoveHandler);
 
   const destroy = () => {
-    removeEventListener('gamepad:buttonpress:analog', gamepadButtonpressAnalogHandler);
+    removeEventListener('gamepadbuttonpress', gamepadButtonpressAnalogHandler);
 
-    removeEventListener('gamepad:analogmove', gamepadAnalogMoveHandler);
+    removeEventListener('gamepadanalogmove', gamepadAnalogMoveHandler);
   };
 
   return destroy;

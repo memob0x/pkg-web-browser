@@ -1,7 +1,11 @@
+const hasButtonPressed = require('./has-button-pressed');
+
 const scroll = (el, factor) => {
   el.scrollTo({
     top: el.scrollTop + 250 * factor,
+
     left: 0,
+
     behavior: 'smooth',
   });
 };
@@ -11,18 +15,22 @@ const createGamepadScroller = (client) => {
 
   const { documentElement } = document;
 
-  const gamepadButtonpressR2Handler = () => scroll(documentElement, 1);
+  const gamepadButtonpressHandler = ({ detail }) => {
+    if (hasButtonPressed(detail, 'r2')) {
+      scroll(documentElement, 1);
 
-  const gamepadButtonpressL2Handler = () => scroll(documentElement, -1);
+      return;
+    }
 
-  addEventListener('gamepad:buttonpress:r2', gamepadButtonpressR2Handler);
+    if (hasButtonPressed(detail, 'l2')) {
+      scroll(documentElement, -1);
+    }
+  };
 
-  addEventListener('gamepad:buttonpress:l2', gamepadButtonpressL2Handler);
+  addEventListener('gamepadbuttonpress', gamepadButtonpressHandler);
 
   const destroy = () => {
-    removeEventListener('gamepad:buttonpress:r2', gamepadButtonpressR2Handler);
-
-    removeEventListener('gamepad:buttonpress:l2', gamepadButtonpressL2Handler);
+    removeEventListener('gamepadbuttonpress', gamepadButtonpressHandler);
   };
 
   return destroy;

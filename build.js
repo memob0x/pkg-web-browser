@@ -1,45 +1,35 @@
+const commonjs = require('@rollup/plugin-commonjs');
+
 const { resolve } = require('path');
 const { writeFile } = require('fs/promises');
 
-const { minify } = require('terser');
-
+const { rollup } = require('rollup');
 const transpileScss = require('./src/js/transpile-scss');
-const transpileCjs = require('./src/js/transpile-cjs');
 
-const bundle = (values) => values.reduce((previous, current) => previous + current, '');
+const buildStyle = async () => writeFile(
+  resolve(__dirname, 'dist', 'style.css'),
 
-const minifyCode = async (input) => {
-  const { code } = await minify(input);
+  await transpileScss(resolve(__dirname, 'src', 'assets', 'style.scss')),
+);
 
-  return code;
+const bundleScripts = async () => {
+  const input = await rollup({
+    input: './src/assets/scripts.js',
+    plugins: [commonjs()],
+  });
+
+  const { output } = await input.generate({
+    format: 'iife',
+    name: 'pkgBrowserGamepadRuntime',
+  });
+
+  await writeFile(
+    resolve(__dirname, 'dist', 'scripts.js'),
+
+    output[0].code,
+  );
 };
 
-const bundleCss = async () => {
-  const transpilations = await Promise.all([
-    transpileScss(resolve(__dirname, 'src', 'scss', 'gamepad-pointer.scss')),
-  ]);
+buildStyle();
 
-  await writeFile(resolve(__dirname, 'dist', 'style.css'), bundle(transpilations));
-};
-
-const bundleJs = async () => {
-  const transpilations = await Promise.all([
-    transpileCjs(resolve(__dirname, 'src', 'js', 'create-gamepad-support.js')),
-
-    transpileCjs(resolve(__dirname, 'src', 'js', 'create-gamepad-pointer.js')),
-
-    transpileCjs(resolve(__dirname, 'src', 'js', 'create-gamepad-scroller.js')),
-  ]);
-
-  await writeFile(resolve(__dirname, 'dist', 'scripts.js'), await minifyCode(`${bundle(transpilations)}
-    createGamepadSupport(window);
-
-    createGamepadPointer(window);
-    
-    createGamepadScroller(window);
-  `));
-};
-
-bundleCss();
-
-bundleJs();
+bundleScripts();

@@ -1,7 +1,27 @@
 const puppeteer = require('puppeteer');
 const hasPageInjectedResources = require('./has-page-injected-resources');
 const injectPageResources = require('./inject-page-resources');
+const setPageInjectionFlag = require('./set-page-injection-flag');
 const sleep = require('./sleep');
+
+const handleError = async (page, message) => {
+  if (message.includes('Failed to add page binding with name')) {
+    return true;
+  }
+
+  if (message.includes('Execution context was destroyed')) {
+    await setPageInjectionFlag(page, false);
+
+    return true;
+  }
+
+  // eslint-disable-next-line no-console
+  console.error(message);
+
+  await page.close();
+
+  return false;
+};
 
 const launchBrowser = async (
   url,
@@ -48,30 +68,24 @@ const launchBrowser = async (
 
   await page.setViewport({ width: viewportWidth, height: viewportHeight });
 
-  await page.waitForNavigation({ waitUntil: 'load' });
-
-  // TODO: check, maybe replace polling with a cleaner approach in order to support live reloads
   const pollPageResourcesInjection = async () => {
     try {
-      const ok = await hasPageInjectedResources(page);
+      const injected = await hasPageInjectedResources(page);
 
-      if (!ok) {
+      if (!injected) {
         await injectPageResources(page, css, js);
       }
     } catch ({ message }) {
-      // NOTE: "Execution context was destroyed, most likely because of a navigation."
-      // error is raised by page reload...
-      if (message.indexOf('Execution context was destroyed') < -1) {
-        // ...any other error would cause the browser to close
-        await page.close();
+      const shouldContinue = await handleError(page, message);
 
+      if (!shouldContinue) {
         return;
       }
     }
 
-    await pollPageResourcesInjection();
+    await sleep(2000);
 
-    await sleep(500);
+    await pollPageResourcesInjection();
   };
 
   await pollPageResourcesInjection();
