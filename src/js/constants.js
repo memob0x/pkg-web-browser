@@ -1,4 +1,4 @@
-const BOOL_LOG_LEVEL = 3; // 1 only errors, 2 errors and wornings, 3 all
+const BOOL_LOG_LEVEL = 3; // 1 = only errors, 2 = errors and warnings, 3 = all
 const INT_MS_THROTTLE_DELAY = 250;
 const STRING_INJECTED_FLAG_NAME = 'hasPuppeteerInjectedResources';
 
