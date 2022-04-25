@@ -2,40 +2,54 @@ const throttle = require('./throttle');
 const triggerPageTabNavigation = require('./trigger-page-tab-navigation');
 const getHandledElementUnderBoundingRect = require('./get-handled-element-under-bounding-rect');
 const hasButtonPressed = require('./has-button-pressed');
-const setPageInjectionFlag = require('./set-page-injection-flag');
+const log = require('./log');
 //  triggerPageNavigation = require('./trigger-page-navigation');
 
 const {
   INT_MS_THROTTLE_DELAY,
 } = require('./constants');
+const setPageInjectionFlag = require('./set-page-injection-flag');
 
 const injectPageResources = async (page, css, js) => {
+  log('log', '0');
+
+  await setPageInjectionFlag(page, true);
+
+  log('log', '1');
+
   await Promise.all([
     page.addStyleTag({ content: css }),
 
     page.addScriptTag({ content: js }),
   ]);
 
-  await Promise.all([
-    page.exposeFunction('gamepadButtonPressHandler', throttle(async (detail) => {
-      const hasButtonPressedA = hasButtonPressed(detail, 'a');
+  log('log', '2');
 
-      if (hasButtonPressedA) {
-        const element = await page.$('*:focus');
+  try {
+    await Promise.all([
+      page.exposeFunction('gamepadButtonPressHandler', throttle(async (detail) => {
+        log('log', 'gamepadButtonPressHandler');
 
-        if (element) {
-          await element.click();
+        const hasButtonPressedA = hasButtonPressed(detail, 'a');
+
+        if (hasButtonPressedA) {
+          const element = await page.$('*:focus');
+
+          if (element) {
+            await element.click();
+          }
+
+          return;
         }
 
-        return;
-      }
+        const hasButtonPressedL1 = hasButtonPressed(detail, 'l1');
+        // const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
+        const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
+        // const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
 
-      const hasButtonPressedL1 = hasButtonPressed(detail, 'l1');
-      // const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
-      const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
-      // const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
-
-      /* if (hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2) {
+        /* if (
+          hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2
+        ) {
         await triggerPageNavigation(page);
 
         return;
@@ -53,25 +67,32 @@ const injectPageResources = async (page, css, js) => {
         return;
       } */
 
-      if (hasButtonPressedR1) {
-        await triggerPageTabNavigation(page, false);
+        if (hasButtonPressedR1) {
+          await triggerPageTabNavigation(page, false);
 
-        return;
-      }
+          return;
+        }
 
-      if (hasButtonPressedL1) {
-        await triggerPageTabNavigation(page, true);
-      }
-    }, INT_MS_THROTTLE_DELAY)),
+        if (hasButtonPressedL1) {
+          await triggerPageTabNavigation(page, true);
+        }
+      }, INT_MS_THROTTLE_DELAY)),
 
-    page.exposeFunction('gamepadPointerSelectionHandler', throttle(async (detail) => {
-      const closestElement = await getHandledElementUnderBoundingRect(page, detail);
+      page.exposeFunction('gamepadPointerSelectionHandler', throttle(async (detail) => {
+        log('log', 'gamepadPointerSelectionHandler');
 
-      if (closestElement) {
-        await closestElement.focus();
-      }
-    }, INT_MS_THROTTLE_DELAY)),
-  ]);
+        const closestElement = await getHandledElementUnderBoundingRect(page, detail);
+
+        if (closestElement) {
+          await closestElement.focus();
+        }
+      }, INT_MS_THROTTLE_DELAY)),
+    ]);
+
+    log('log', '3');
+  } catch (e) {
+    log('log', 'exposed function were already present');
+  }
 
   await page.evaluate(`
     window.addEventListener('gamepadpointerselection', ({ detail }) => window.gamepadPointerSelectionHandler(detail));
@@ -81,7 +102,7 @@ const injectPageResources = async (page, css, js) => {
     }); 
   `);
 
-  await setPageInjectionFlag(page, true);
+  log('log', '4');
 };
 
 module.exports = injectPageResources;

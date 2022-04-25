@@ -4,86 +4,69 @@ const { exec } = require('pkg');
 
 const { writeFile, unlink } = require('fs/promises');
 const readFileUtf8 = require('./src/js/read-file-utf8');
+const log = require('./src/js/log');
 
-const { options } = argv.option([
+const { options, targets } = argv.option([
   {
-    name: 'url',
-    short: 'u',
-    type: 'string',
-    description: 'Defines the opened website url',
-    example: "'script --url=//website.org' or 'script -u //website.org'",
-  },
-  {
-    name: 'width',
-    short: 'vw',
+    name: 'viewport-width',
     type: 'int',
-    description: 'Defines the opened website viewport width',
-    example: "'script --width=720' or 'script -w 720'",
+    description: 'Defines the opened website viewport viewport-width',
+    example: "'pkg-browser-gamepad --viewport-width=720'",
   },
   {
-    name: 'height',
-    short: 'vh',
+    name: 'viewport-height',
     type: 'int',
-    description: 'Defines the opened website viewport height',
-    example: "'script --height=576' or 'script -h 576'",
+    description: 'Defines the opened website viewport viewport-height',
+    example: "'pkg-browser-gamepad --viewport-height=576'",
   },
   {
-    name: 'browser',
-    short: 'b',
+    name: 'browser-executable-path',
     type: 'string',
     description: 'Defines the used browser executable path',
-    example: "'script --browser=/usr/bin/chromium-browser' or 'script -b /usr/bin/chromium-browser'",
+    example: "'pkg-browser-gamepad --browser-executable-path=/usr/bin/chromium-browser'",
   },
   {
-    name: 'profile',
-    short: 'p',
+    name: 'browser-user-data-dir',
     type: 'string',
     description: 'Defines the used browser path',
-    example: "'script --profile=/home/user/.config/chromium/Default' or 'script -p /home/user/.config/chromium/Default'",
+    example: "'pkg-browser-gamepad --browser-user-data-dir=/home/user/.config/chromium/Default'",
   },
   {
-    name: 'target',
-    short: 't',
+    name: 'pkg-target',
     type: 'string',
     description: 'Defines the final program architecture',
-    example: "'script --target=node16-macos-x64' or 'script -t node16-macos-x64'",
+    example: "'pkg-browser-gamepad --pkg-target=node16-macos-x64'",
   },
   {
-    name: 'output',
-    short: 'o',
+    name: 'browser-window-mode',
     type: 'string',
-    description: 'Defines the final program output file',
-    example: "'script --output=/my/dist/path/test.exe' or 'script -o /my/dist/path/test.exe'",
-  },
-  {
-    name: 'kiosk',
-    short: 'k',
-    type: 'boolean',
-    description: 'Defines whether the final program should open in kiosk mode or not',
-    example: "'script --kiosk or 'script -k'",
+    description: 'Defines whether the final program should open in kiosk mode or other modes',
+    example: "'pkg-browser-gamepad --browser-window-mode=kiosk'",
   },
 ]).run();
 
 const {
-  url = '//localhost',
+  'browser-executable-path': browserExecutablePath,
 
-  width = 1920,
+  'browser-user-data-dir': browserUserDataDir,
 
-  height = 1080,
+  'viewport-width': viewportWidth = 1920,
 
-  browser,
+  'viewport-height': viewportHeight = 1080,
 
-  profile,
+  'pkg-target': pkgTarget = 'host',
 
-  target = 'host',
-
-  output = '',
-
-  kiosk,
+  'browser-window-mode': browserWindowMode = 'kiosk',
 } = options || {};
 
+const [
+  url = '//localhost',
+
+  output = '',
+] = targets || [];
+
 (async () => {
-  const runtimeFilename = `runtime-${performance.now()}.js`;
+  const runtimeFilename = `runtime-${performance.now() + Math.random()}.js`;
 
   const runtimeFile = `${__dirname}/${runtimeFilename}`;
 
@@ -97,15 +80,15 @@ const {
     `require('./src/js/launch-browser')(
       ${JSON.stringify(url)},
       
-      ${width},
+      ${viewportWidth},
       
-      ${height},
+      ${viewportHeight},
       
-      ${JSON.stringify(browser)},
+      ${JSON.stringify(browserExecutablePath)},
       
-      ${JSON.stringify(profile)},
+      ${JSON.stringify(browserUserDataDir)},
       
-      ${kiosk},
+      ${JSON.stringify(browserWindowMode)},
 
       ${JSON.stringify(runtimeCssCodeToBeInjected)},
 
@@ -124,14 +107,13 @@ const {
       'GZip',
 
       '--target',
-      target,
+      pkgTarget,
 
       '--output',
       output,
     ]);
   } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error(e);
+    log('error', e);
   }
 
   await unlink(runtimeFile);

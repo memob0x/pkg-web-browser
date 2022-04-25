@@ -2,7 +2,9 @@
 
 ![Node.js CI](https://github.com/memob0x/pkg-website-gamepad/workflows/Node.js%20CI/badge.svg)
 
-Bundle a website and control it with a gamepad, handy for media centers, presentations or accessibility assessments.
+Reduce a website to an executable and control it with a gamepad.
+
+Handy for media centers, presentations or accessibility assessment purposes.
 
 ## Usage
 
@@ -17,22 +19,20 @@ pkg-website-gamepad [options]
 
   Options:
 
-    -h, --help            output usage information
-    -u, --url             defines the opened website url
-    -vw, --width          defines the opened website viewport width
-    -vh, --height         defines the opened website viewport height
-    -b, --browser         defines the used browser executable path
-    -p, --profile         defines the used browser profile directory path
-    -t, --target          defines the final program architecture
-    -o, --output          defines the final program output file
-    -k, --kiosk           defines whether the final program should open in kiosk mode or not
+    -h, --help                  output usage information
+    --pkg-target                defines the final program architecture
+    --browser-executable-path   defines the used browser executable path
+    --browser-user-data-dir     defines the used browser profile directory path
+    --viewport-width            defines the opened website viewport width
+    --viewport-height           defines the opened website viewport height
+    --browser-window-mode       defines whether the final program should open in kiosk mode or in other supported mode
 
   Examples:
 
   – Makes an executable for the current architecture
-    $ pkg-website-gamepad -u "https://website.com"
+    $ pkg-website-gamepad "https://website.com"
   - Makes an executable for windows
-    $ pkg-website-gamepad -t node16-win-x64 -u "https://website.com"
+    $ pkg-website-gamepad --pkg-target=node16-win-x64 "https://website.com" "website.exe"
   - Makes an executable for windows using an existing chrome installation and chrome profile
-    $ pkg-website-gamepad -t node16-win-x64 -b "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" -p "C:\\Users\\danie\\AppData\\Local\\Google\\Chrome\\User Data\\Default" -u https://website.com -o "website.exe"
+    $ pkg-website-gamepad --pkg-target=node16-win-x64 --browser-exeuctable-path="C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" --browser-user-data-dir="C:\\Users\\danie\\AppData\\Local\\Google\\Chrome\\User Data\\Default" https://website.com "website.exe"
 ```
