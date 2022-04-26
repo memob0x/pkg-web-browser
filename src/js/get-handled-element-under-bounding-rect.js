@@ -2,14 +2,9 @@ const getBoundingRectCenterPoint = require('./get-bounding-rect-center-point');
 const getPointsDistance = require('./get-points-distance');
 const getBoundingRectsOverlappingArea = require('./get-bounding-rects-overlapping-area');
 const convertBoundingBoxToBoundingRect = require('./convert-bounding-box-to-bounding-rect');
-const queryPageFocusableHandledElements = require('./query-page-focusable-handled-elements');
 const getHandledElementBoundingBox = require('./get-handled-element-bounding-box');
 
-const triggerHandledElementUnderBoundingRectHoverFocus = async (page, boundingRect) => {
-  const centerPoint = getBoundingRectCenterPoint(boundingRect);
-
-  const focusableElements = await queryPageFocusableHandledElements(page);
-
+const getHandledElementUnderBoundingRect = async (focusableElements, centerPoint, boundingRect) => {
   const { element: closestElement } = await focusableElements.reduce(
     async (formerValue, element) => {
       const elementBoundingBox = await getHandledElementBoundingBox(element);
@@ -59,4 +54,4 @@ const triggerHandledElementUnderBoundingRectHoverFocus = async (page, boundingRe
   return closestElement;
 };
 
-module.exports = triggerHandledElementUnderBoundingRectHoverFocus;
+module.exports = getHandledElementUnderBoundingRect;

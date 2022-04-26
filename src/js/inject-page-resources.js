@@ -1,9 +1,9 @@
 const throttle = require('./throttle');
 const triggerPageTabNavigation = require('./trigger-page-tab-navigation');
-const getHandledElementUnderBoundingRect = require('./get-handled-element-under-bounding-rect');
+const getHandledElementUnderBoundingRect = require('./get-handled-element-focusable-under-bounding-rect');
 const hasButtonPressed = require('./has-button-pressed');
 const log = require('./log');
-//  triggerPageNavigation = require('./trigger-page-navigation');
+const triggerPageNavigation = require('./trigger-page-navigation');
 
 const {
   INT_MS_THROTTLE_DELAY,
@@ -43,29 +43,29 @@ const injectPageResources = async (page, css, js) => {
         }
 
         const hasButtonPressedL1 = hasButtonPressed(detail, 'l1');
-        // const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
+        const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
         const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
-        // const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
+        const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
 
-        /* if (
+        if (
           hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2
         ) {
-        await triggerPageNavigation(page);
+          await triggerPageNavigation(page, 0, true);
 
-        return;
-      }
+          return;
+        }
 
-      if (hasButtonPressedL1 && hasButtonPressedL2) {
-        await triggerPageNavigation(page, -1);
+        if (hasButtonPressedL1 && hasButtonPressedL2) {
+          await triggerPageNavigation(page, -1, true);
 
-        return;
-      }
+          return;
+        }
 
-      if (hasButtonPressedR1 && hasButtonPressedR2) {
-        await triggerPageNavigation(page, 1);
+        if (hasButtonPressedR1 && hasButtonPressedR2) {
+          await triggerPageNavigation(page, 1, true);
 
-        return;
-      } */
+          return;
+        }
 
         if (hasButtonPressedR1) {
           await triggerPageTabNavigation(page, false);
