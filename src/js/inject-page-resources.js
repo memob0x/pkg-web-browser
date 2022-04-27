@@ -4,13 +4,17 @@ const getHandledElementUnderBoundingRect = require('./get-handled-element-focusa
 const hasButtonPressed = require('./has-button-pressed');
 const log = require('./log');
 const triggerPageNavigation = require('./trigger-page-navigation');
-
-const {
-  INT_MS_THROTTLE_DELAY,
-} = require('./constants');
 const setPageInjectionFlag = require('./set-page-injection-flag');
+const triggerPageScroll = require('./trigger-page-scroll');
+const getHandledElementPropValue = require('./get-handled-element-prop-value');
+const queryPage = require('./query-page');
 
-const injectPageResources = async (page, css, js) => {
+const { INT_MS_THROTTLE_DELAY } = require('./constants');
+const triggerHandledElementMethod = require('./trigger-handled-element-method');
+
+const INT_SCROLL_DELTA = 250;
+
+const injectPageResources = async (page, viewportWidth, viewportHeight, css, js) => {
   log('log', '0');
 
   await setPageInjectionFlag(page, true);
@@ -26,79 +30,116 @@ const injectPageResources = async (page, css, js) => {
   log('log', '2');
 
   try {
-    await Promise.all([
-      page.exposeFunction('gamepadButtonPressHandler', throttle(async (detail) => {
-        log('log', 'gamepadButtonPressHandler');
+    await page.exposeFunction('gamepadButtonPressHandler', throttle(async (detail, support) => {
+      const { gamepadPointer } = support || {};
 
-        const hasButtonPressedA = hasButtonPressed(detail, 'a');
+      const { activeDeferred: isActivePointer, boundingRect } = gamepadPointer || {};
 
-        if (hasButtonPressedA) {
-          const element = await page.$('*:focus');
+      const closestElement = await getHandledElementUnderBoundingRect(page, boundingRect);
 
-          if (element) {
-            await element.click();
-          }
+      const hasButtonPressedA = hasButtonPressed(detail, 'a');
 
-          return;
-        }
+      if (hasButtonPressedA) {
+        const [element] = await queryPage(page, '*:focus');
 
-        const hasButtonPressedL1 = hasButtonPressed(detail, 'l1');
-        const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
-        const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
-        const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
-
-        if (
-          hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2
-        ) {
-          await triggerPageNavigation(page, 0, true);
+        if (!element) {
+          log('log', '"a" pressed but nothing is focused');
 
           return;
         }
 
-        if (hasButtonPressedL1 && hasButtonPressedL2) {
-          await triggerPageNavigation(page, -1, true);
+        log('log', `"a" pressed on focused element tagName: ${await getHandledElementPropValue(element, 'tagName')}`);
 
-          return;
-        }
+        await triggerHandledElementMethod(element, 'click');
 
-        if (hasButtonPressedR1 && hasButtonPressedR2) {
-          await triggerPageNavigation(page, 1, true);
+        return;
+      }
 
-          return;
-        }
+      const hasButtonPressedAnalogLeft = hasButtonPressed(detail, 'analogleft');
+      const hasButtonPressedAnalogRight = hasButtonPressed(detail, 'analogright');
 
-        if (hasButtonPressedR1) {
-          await triggerPageTabNavigation(page, false);
+      const hasButtonPressedAnalog = hasButtonPressedAnalogLeft || hasButtonPressedAnalogRight;
 
-          return;
-        }
+      if (hasButtonPressedAnalog && isActivePointer && closestElement) {
+        log('log', `focusing ${await getHandledElementPropValue(closestElement, 'tagName')}`);
 
-        if (hasButtonPressedL1) {
-          await triggerPageTabNavigation(page, true);
-        }
-      }, INT_MS_THROTTLE_DELAY)),
+        await triggerHandledElementMethod(closestElement, 'focus');
 
-      page.exposeFunction('gamepadPointerSelectionHandler', throttle(async (detail) => {
-        log('log', 'gamepadPointerSelectionHandler');
+        return;
+      }
 
-        const closestElement = await getHandledElementUnderBoundingRect(page, detail);
+      const hasButtonPressedL1 = hasButtonPressed(detail, 'l1');
+      const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
+      const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
+      const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
 
-        if (closestElement) {
-          await closestElement.focus();
-        }
-      }, INT_MS_THROTTLE_DELAY)),
-    ]);
+      if (
+        hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2
+      ) {
+        await triggerPageNavigation(page, 0, true);
+
+        return;
+      }
+
+      if (hasButtonPressedL1 && hasButtonPressedL2) {
+        await triggerPageNavigation(page, -1, true);
+
+        return;
+      }
+
+      if (hasButtonPressedR1 && hasButtonPressedR2) {
+        await triggerPageNavigation(page, 1, true);
+
+        return;
+      }
+
+      if (hasButtonPressedR1) {
+        await triggerPageTabNavigation(page, false);
+
+        return;
+      }
+
+      if (hasButtonPressedL1) {
+        await triggerPageTabNavigation(page, true);
+
+        return;
+      }
+
+      if (hasButtonPressedR2) {
+        await triggerPageScroll(
+          page,
+
+          viewportWidth,
+
+          viewportHeight,
+
+          { deltaY: INT_SCROLL_DELTA },
+        );
+
+        return;
+      }
+
+      if (hasButtonPressedL2) {
+        await triggerPageScroll(
+          page,
+
+          viewportWidth,
+
+          viewportHeight,
+
+          { deltaY: -INT_SCROLL_DELTA },
+        );
+      }
+    }, INT_MS_THROTTLE_DELAY));
 
     log('log', '3');
   } catch (e) {
     log('log', 'exposed function were already present');
   }
 
-  await page.evaluate(`
-    window.addEventListener('gamepadpointerselection', ({ detail }) => window.gamepadPointerSelectionHandler(detail));
-    
+  await page.evaluate(`    
     window.addEventListener('gamepadbuttonpress', ({ detail }) => {
-      window.gamepadButtonPressHandler(JSON.parse(JSON.stringify(detail)));
+      window.gamepadButtonPressHandler(detail, window.pkgBrowserGamepadRuntime);
     }); 
   `);
 

@@ -8,68 +8,72 @@ const createGamepadPointer = (client) => {
 
     removeEventListener,
 
-    dispatchEvent,
-
-    CustomEvent,
-
     document,
   } = client || {};
 
-  const pointer = document.createElement('div');
+  const element = document.createElement('div');
 
-  const { classList: pointerCssClassList } = pointer;
+  const { classList } = element;
 
-  pointerCssClassList.add('gamepad-pointer');
+  let activeDeferred = false;
+
+  classList.add('gamepad-pointer');
 
   let pointerDeactivationTimeout;
 
   let left = 0;
   let top = 0;
 
-  const deactivatePointer = () => {
+  const deactivate = () => {
     clearTimeout(pointerDeactivationTimeout);
 
-    pointerCssClassList.remove('gamepad-pointer--active');
+    classList.remove('gamepad-pointer--active');
+
+    setTimeout(() => {
+      activeDeferred = false;
+    });
   };
 
-  const activatePointer = () => {
+  const activate = () => {
     const { body } = document;
 
     if (!body) {
       return;
     }
 
-    if (!body.contains(pointer)) {
-      body.append(pointer);
+    if (!body.contains(element)) {
+      body.append(element);
     }
 
-    pointerCssClassList.add('gamepad-pointer--active');
+    classList.add('gamepad-pointer--active');
 
     clearTimeout(pointerDeactivationTimeout);
 
-    pointerDeactivationTimeout = setTimeout(deactivatePointer, 4000);
+    pointerDeactivationTimeout = setTimeout(deactivate, 4000);
+
+    setTimeout(() => {
+      activeDeferred = true;
+    });
   };
 
-  const isPointerActive = () => pointerCssClassList.contains('gamepad-pointer--active');
+  const isActive = () => classList.contains('gamepad-pointer--active');
 
   const gamepadButtonpressAnalogHandler = throttle(({ detail }) => {
     if (!hasButtonPressed(detail, 'analogleft') && !hasButtonPressed(detail, 'analogright')) {
       return;
     }
 
-    if (isPointerActive()) {
-      dispatchEvent(new CustomEvent('gamepadpointerselection', { detail: pointer.getBoundingClientRect() }));
-
-      deactivatePointer();
+    if (isActive()) {
+      deactivate();
 
       return;
     }
 
-    activatePointer();
+    activate();
   }, INT_MS_THROTTLE_DELAY);
 
   const gamepadAnalogMoveHandler = ({ detail }) => {
-    if (!isPointerActive()) {
+    if (!isActive()) {
       return;
     }
 
@@ -85,7 +89,7 @@ const createGamepadPointer = (client) => {
     style.setProperty('--gamepad-pointer-left', `${left}px`);
     style.setProperty('--gamepad-pointer-top', `${top}px`);
 
-    activatePointer();
+    activate();
   };
 
   addEventListener('gamepadbuttonpress', gamepadButtonpressAnalogHandler);
@@ -98,7 +102,29 @@ const createGamepadPointer = (client) => {
     removeEventListener('gamepadanalogmove', gamepadAnalogMoveHandler);
   };
 
-  return destroy;
+  return {
+    get element() {
+      return element;
+    },
+
+    get boundingRect() {
+      return element.getBoundingClientRect();
+    },
+
+    get active() {
+      return isActive();
+    },
+
+    get activeDeferred() {
+      return activeDeferred;
+    },
+
+    activate,
+
+    deactivate,
+
+    destroy,
+  };
 };
 
 module.exports = createGamepadPointer;

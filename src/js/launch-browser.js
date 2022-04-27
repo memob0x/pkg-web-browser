@@ -1,20 +1,8 @@
 const puppeteer = require('puppeteer');
-const hasPageInjectedResources = require('./has-page-injected-resources');
-const injectPageResources = require('./inject-page-resources');
-const log = require('./log');
+
+const pollOtherPagesClose = require('./poll-other-pages-close');
+const pollPageResourcesInjection = require('./poll-page-resources-injection');
 const sleep = require('./sleep');
-
-const getPageErrorReport = async (page, message) => {
-  if (message.includes('Execution context was destroyed')) {
-    log('log', 'page reload');
-
-    return { shouldExit: false, shouldRepeatInjection: true };
-  }
-
-  log('error', message);
-
-  return { shouldExit: true };
-};
 
 const launchBrowser = async (
   url,
@@ -59,49 +47,29 @@ const launchBrowser = async (
 
   const [page] = await browser.pages();
 
-  await page.setViewport({ width: viewportWidth, height: viewportHeight });
+  await page.setViewport({
+    width: viewportWidth,
+
+    height: viewportHeight,
+  });
 
   await sleep(4000);
 
-  let isInjectedForPolling = false;
+  await Promise.all([
+    pollPageResourcesInjection(
+      page,
 
-  const pollPageResourcesInjection = async () => {
-    try {
-      log('log', 'for polling, resources are injected:', isInjectedForPolling, 'resources are actually injected:', await hasPageInjectedResources(page));
+      viewportWidth,
 
-      if (!isInjectedForPolling || !await hasPageInjectedResources(page)) {
-        log('log', 'injecting');
+      viewportHeight,
 
-        isInjectedForPolling = true;
+      css,
 
-        await injectPageResources(page, css, js);
+      js,
+    ),
 
-        log('log', 'injected');
-      }
-    } catch ({ message }) {
-      const {
-        shouldExit,
-
-        shouldRepeatInjection,
-      } = await getPageErrorReport(page, message);
-
-      if (shouldExit) {
-        await page.close();
-
-        return;
-      }
-
-      if (shouldRepeatInjection) {
-        isInjectedForPolling = false;
-      }
-    }
-
-    await sleep(2000);
-
-    await pollPageResourcesInjection();
-  };
-
-  await pollPageResourcesInjection();
+    pollOtherPagesClose(browser, page),
+  ]);
 };
 
 module.exports = launchBrowser;
