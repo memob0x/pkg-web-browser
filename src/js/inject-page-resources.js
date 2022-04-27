@@ -11,6 +11,7 @@ const queryPage = require('./query-page');
 
 const { INT_MS_THROTTLE_DELAY } = require('./constants');
 const triggerHandledElementMethod = require('./trigger-handled-element-method');
+const getBoundingRectCenterPoint = require('./get-bounding-rect-center-point');
 
 const INT_SCROLL_DELTA = 250;
 
@@ -35,77 +36,100 @@ const injectPageResources = async (page, viewportWidth, viewportHeight, css, js)
 
       const { activeDeferred: isActivePointer, boundingRect } = gamepadPointer || {};
 
-      const closestElement = await getHandledElementUnderBoundingRect(page, boundingRect);
+      const [pointerX, pointerY] = getBoundingRectCenterPoint(boundingRect);
+
+      const elementPointer = await getHandledElementUnderBoundingRect(page, boundingRect);
+      const [elementActive] = await queryPage(page, '*:focus');
+
+      let elementClickable = isActivePointer ? elementPointer : elementActive;
+      elementClickable = elementClickable || elementPointer;
 
       const hasButtonPressedA = hasButtonPressed(detail, 'a');
-
-      if (hasButtonPressedA) {
-        const [element] = await queryPage(page, '*:focus');
-
-        if (!element) {
-          log('log', '"a" pressed but nothing is focused');
-
-          return;
-        }
-
-        log('log', `"a" pressed on focused element tagName: ${await getHandledElementPropValue(element, 'tagName')}`);
-
-        await triggerHandledElementMethod(element, 'click');
-
-        return;
-      }
-
       const hasButtonPressedAnalogLeft = hasButtonPressed(detail, 'analogleft');
       const hasButtonPressedAnalogRight = hasButtonPressed(detail, 'analogright');
-
       const hasButtonPressedAnalog = hasButtonPressedAnalogLeft || hasButtonPressedAnalogRight;
-
-      if (hasButtonPressedAnalog && isActivePointer && closestElement) {
-        log('log', `focusing ${await getHandledElementPropValue(closestElement, 'tagName')}`);
-
-        await triggerHandledElementMethod(closestElement, 'focus');
-
-        return;
-      }
-
       const hasButtonPressedL1 = hasButtonPressed(detail, 'l1');
       const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
       const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
       const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
 
-      if (
-        hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2
-      ) {
+      const elementClickableTag = await getHandledElementPropValue(elementClickable, 'tagName');
+
+      log('log', 'button press', elementClickableTag);
+
+      if (isActivePointer) {
+        log('log', `mouse moved to ${pointerX} ${pointerY}`);
+
+        await page.mouse.move(pointerX, pointerY);
+      }
+
+      if (hasButtonPressedA && elementClickableTag === 'IFRAME') {
+        log('log', `iframe navigation ${elementClickableTag}`);
+
+        await page.goto(await getHandledElementPropValue(elementClickable, 'src'));
+
+        return;
+      }
+
+      if (hasButtonPressedA && elementClickableTag) {
+        log('log', `click ${elementClickableTag}`);
+
+        await triggerHandledElementMethod(elementClickable, 'click');
+
+        return;
+      }
+
+      if (hasButtonPressedAnalog && isActivePointer && elementPointer) {
+        log('log', `focus ${await getHandledElementPropValue(elementPointer, 'tagName')}`);
+
+        await triggerHandledElementMethod(elementPointer, 'focus');
+
+        return;
+      }
+
+      if (hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2) {
+        log('log', 'page reload');
+
         await triggerPageNavigation(page, 0, true);
 
         return;
       }
 
       if (hasButtonPressedL1 && hasButtonPressedL2) {
+        log('log', 'history: go back');
+
         await triggerPageNavigation(page, -1, true);
 
         return;
       }
 
       if (hasButtonPressedR1 && hasButtonPressedR2) {
+        log('log', 'history: go forward');
+
         await triggerPageNavigation(page, 1, true);
 
         return;
       }
 
       if (hasButtonPressedR1) {
+        log('log', 'tab navigation: go right');
+
         await triggerPageTabNavigation(page, false);
 
         return;
       }
 
       if (hasButtonPressedL1) {
+        log('log', 'tab navigation: go back');
+
         await triggerPageTabNavigation(page, true);
 
         return;
       }
 
       if (hasButtonPressedR2) {
+        log('log', 'scroll down');
+
         await triggerPageScroll(
           page,
 
@@ -120,6 +144,8 @@ const injectPageResources = async (page, viewportWidth, viewportHeight, css, js)
       }
 
       if (hasButtonPressedL2) {
+        log('log', 'scroll top');
+
         await triggerPageScroll(
           page,
 
