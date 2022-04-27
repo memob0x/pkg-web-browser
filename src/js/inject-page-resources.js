@@ -4,7 +4,6 @@ const getHandledElementUnderBoundingRect = require('./get-handled-element-focusa
 const hasButtonPressed = require('./has-button-pressed');
 const log = require('./log');
 const triggerPageNavigation = require('./trigger-page-navigation');
-const setPageInjectionFlag = require('./set-page-injection-flag');
 const triggerPageScroll = require('./trigger-page-scroll');
 const getHandledElementPropValue = require('./get-handled-element-prop-value');
 const queryPage = require('./query-page');
@@ -15,10 +14,16 @@ const getBoundingRectCenterPoint = require('./get-bounding-rect-center-point');
 
 const INT_SCROLL_DELTA = 250;
 
-const injectPageResources = async (page, viewportWidth, viewportHeight, css, js) => {
-  log('log', '0');
+const injectPageResources = async (page, options) => {
+  const {
+    width,
 
-  await setPageInjectionFlag(page, true);
+    height,
+
+    css,
+
+    js,
+  } = options || {};
 
   log('log', '1');
 
@@ -133,9 +138,9 @@ const injectPageResources = async (page, viewportWidth, viewportHeight, css, js)
         await triggerPageScroll(
           page,
 
-          viewportWidth,
+          width,
 
-          viewportHeight,
+          height,
 
           { deltaY: INT_SCROLL_DELTA },
         );
@@ -149,9 +154,9 @@ const injectPageResources = async (page, viewportWidth, viewportHeight, css, js)
         await triggerPageScroll(
           page,
 
-          viewportWidth,
+          width,
 
-          viewportHeight,
+          height,
 
           { deltaY: -INT_SCROLL_DELTA },
         );

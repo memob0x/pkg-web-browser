@@ -8,16 +8,16 @@ const log = require('./src/js/log');
 
 const { options, targets } = argv.option([
   {
-    name: 'browser-viewport-width',
+    name: 'browser-width',
     type: 'int',
-    description: 'Defines the opened website viewport viewport-width',
-    example: "'pkg-browser-gamepad --browser-viewport-width=720'",
+    description: 'Defines the opened website viewport width',
+    example: "'pkg-browser-gamepad --browser-width=720'",
   },
   {
-    name: 'browser-viewport-height',
+    name: 'browser-height',
     type: 'int',
-    description: 'Defines the opened website viewport viewport-height',
-    example: "'pkg-browser-gamepad --browser-viewport-height=576'",
+    description: 'Defines the opened website viewport height',
+    example: "'pkg-browser-gamepad --browser-height=576'",
   },
   {
     name: 'browser-executable-path',
@@ -32,10 +32,16 @@ const { options, targets } = argv.option([
     example: "'pkg-browser-gamepad --browser-user-data-dir=/home/user/.config/chromium/Default'",
   },
   {
-    name: 'browser-window-mode',
-    type: 'string',
-    description: 'Defines whether the final program should open in kiosk mode or other modes',
-    example: "'pkg-browser-gamepad --browser-window-mode=kiosk'",
+    name: 'kiosk',
+    type: 'boolean',
+    description: 'Defines whether the final program should open in kiosk mode or not',
+    example: "'pkg-browser-gamepad --kiosk'",
+  },
+  {
+    name: 'focus',
+    type: 'boolean',
+    description: 'Defines whether the final program should always stay on top disallowing other pages opening (popups)',
+    example: "'pkg-browser-gamepad --focus'",
   },
   {
     name: 'pkg-target',
@@ -43,20 +49,30 @@ const { options, targets } = argv.option([
     description: 'Defines the final program architecture',
     example: "'pkg-browser-gamepad --pkg-target=node16-macos-x64'",
   },
+  {
+    name: 'loop-interval-time',
+    type: 'string',
+    description: 'Defines the final program internal process frequency time (in ms) for it to compute updates',
+    example: "'pkg-browser-gamepad --loop-interval-time=6000'",
+  },
 ]).run();
 
 const {
-  'browser-executable-path': browserExecutablePath,
+  'browser-executable-path': executablePath,
 
-  'browser-user-data-dir': browserUserDataDir,
+  'browser-user-data-dir': userDataDir,
 
-  'browser-viewport-width': viewportWidth = 1920,
+  'browser-width': width = 1920,
 
-  'browser-viewport-height': viewportHeight = 1080,
+  'browser-height': height = 1080,
 
-  'browser-window-mode': browserWindowMode = 'kiosk',
+  kiosk = false,
+
+  focus = false,
 
   'pkg-target': pkgTarget = 'host',
+
+  'loop-interval-time': loopIntervalTime = 75,
 } = options || {};
 
 const [
@@ -70,29 +86,34 @@ const [
 
   const runtimeFile = `${__dirname}/${runtimeFilename}`;
 
-  const runtimeCssCodeToBeInjected = await readFileUtf8('./dist/style.css');
+  // runtimeCssCodeToBeInjected
+  const css = await readFileUtf8('./dist/style.css');
 
-  const runtimeJsCodeToBeInjected = await readFileUtf8('./dist/scripts.js');
+  // runtimeJsCodeToBeInjected
+  const js = await readFileUtf8('./dist/scripts.js');
 
   await writeFile(
     runtimeFile,
 
-    `require('./src/js/launch-browser')(
-      ${JSON.stringify(url)},
-      
-      ${viewportWidth},
-      
-      ${viewportHeight},
-      
-      ${JSON.stringify(browserExecutablePath)},
-      
-      ${JSON.stringify(browserUserDataDir)},
-      
-      ${JSON.stringify(browserWindowMode)},
+    `require('./src/js/launch-browser')(${JSON.stringify(url)}, ${JSON.stringify({
+      executablePath,
 
-      ${JSON.stringify(runtimeCssCodeToBeInjected)},
+      userDataDir,
 
-      ${JSON.stringify(runtimeJsCodeToBeInjected)},
+      width,
+
+      height,
+
+      kiosk,
+
+      focus,
+
+      css,
+
+      js,
+
+      loopIntervalTime,
+    })}
     );`,
   );
 

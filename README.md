@@ -19,13 +19,15 @@ pkg-website-gamepad [options]
 
   Options:
 
-    -h, --help                  output usage information
-    --pkg-target                defines the final program architecture
-    --browser-executable-path   defines the used browser executable path
-    --browser-user-data-dir     defines the used browser profile directory path
-    --browser-viewport-width    defines the opened website viewport width
-    --browser-viewport-height   defines the opened website viewport height
-    --browser-window-mode       defines whether the final program should open in kiosk mode or in other supported mode
+    -h, --help                  Outputs usage information
+    --pkg-target                Defines the final program architecture
+    --browser-executable-path   Defines the used browser executable path
+    --browser-user-data-dir     Defines the used browser profile directory path
+    --browser-width             Defines the opened website width
+    --browser-height            Defines the opened website height
+    --kiosk                     Defines whether the final program should open in kiosk mode or not
+    --focus                     Defines whether the final program should always stay on top disallowing other pages opening (popups)
+    --loop-interval-time        Defines the final program internal process frequency time (in ms) for it to compute updates
 
   Examples:
 
