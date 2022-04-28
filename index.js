@@ -142,7 +142,7 @@ const [
 
   const { globby } = await import('globby');
 
-  const files = await globby(`${runtimeFilePrefix}*${runtimeFileExtension}`);
+  const runtimeFiles = await globby(`${runtimeFilePrefix}*${runtimeFileExtension}`);
 
-  await Promise.all(files.map(unlink));
+  await Promise.all(runtimeFiles.map(unlink));
 })();
