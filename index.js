@@ -82,7 +82,10 @@ const [
 ] = targets || [];
 
 (async () => {
-  const runtimeFilename = `runtime-${performance.now() + Math.random()}.js`;
+  const runtimeFilePrefix = 'runtime-';
+  const runtimeFileExtension = '.js';
+
+  const runtimeFilename = `${runtimeFilePrefix}${performance.now()}${Math.random()}${runtimeFileExtension}`;
 
   const runtimeFile = `${__dirname}/${runtimeFilename}`;
 
@@ -137,5 +140,9 @@ const [
     log('error', e);
   }
 
-  await unlink(runtimeFile);
+  const { globby } = await import('globby');
+
+  const files = await globby(`${runtimeFilePrefix}*${runtimeFileExtension}`);
+
+  await Promise.all(files.map(unlink));
 })();
