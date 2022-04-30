@@ -1,46 +1,43 @@
 const puppeteer = require('puppeteer');
-const hasPageInjectedResources = require('./has-page-injected-resources');
-const injectPageResources = require('./inject-page-resources');
+const getPageTitleExcerpt = require('./get-page-title-excerpt');
+const identifyPages = require('./identify-pages');
+const injectPageResourcesOnce = require('./inject-page-resources-once');
 const log = require('./log');
-const sleep = require('./sleep');
+const loop = require('./loop');
+const triggerPageClose = require('./trigger-page-close');
 
-const getPageErrorReport = async (page, message) => {
-  if (message.includes('Execution context was destroyed')) {
-    log('log', 'page reload');
+const launchBrowser = async (url, options) => {
+  const {
+    width,
 
-    return { shouldExit: false, shouldRepeatInjection: true };
-  }
+    height,
 
-  log('error', message);
+    executablePath,
 
-  return { shouldExit: true };
-};
+    userDataDir,
 
-const launchBrowser = async (
-  url,
+    kiosk,
 
-  viewportWidth,
+    focus,
 
-  viewportHeight,
+    loopIntervalTime,
+  } = options || {};
 
-  executablePath,
-
-  userDataDir,
-
-  mode,
-
-  css,
-
-  js,
-) => {
   const args = [
     `--app=${url}`,
 
+    // NOTE: "new-window" flag proved to be helpful
+    // when the given browser executable has open windows/tabs
+    // with the given browser profile...
     '--new-window',
   ];
 
-  if (mode === 'kiosk') {
+  if (kiosk) {
     args.push('--kiosk');
+  }
+
+  if (!kiosk) {
+    args.push(`--window-size=${width},${height}`);
   }
 
   const browser = await puppeteer.launch({
@@ -57,51 +54,67 @@ const launchBrowser = async (
     args,
   });
 
-  const [page] = await browser.pages();
+  return loop(
+    async () => {
+      const [mainPage, otherPages] = await identifyPages(browser);
 
-  await page.setViewport({ width: viewportWidth, height: viewportHeight });
+      if (!mainPage) {
+        log('error', 'no page found');
 
-  await sleep(4000);
-
-  let isInjectedForPolling = false;
-
-  const pollPageResourcesInjection = async () => {
-    try {
-      log('log', 'for polling, resources are injected:', isInjectedForPolling, 'resources are actually injected:', await hasPageInjectedResources(page));
-
-      if (!isInjectedForPolling || !await hasPageInjectedResources(page)) {
-        log('log', 'injecting');
-
-        isInjectedForPolling = true;
-
-        await injectPageResources(page, css, js);
-
-        log('log', 'injected');
-      }
-    } catch ({ message }) {
-      const {
-        shouldExit,
-
-        shouldRepeatInjection,
-      } = await getPageErrorReport(page, message);
-
-      if (shouldExit) {
-        await page.close();
-
-        return;
+        // break
+        return false;
       }
 
-      if (shouldRepeatInjection) {
-        isInjectedForPolling = false;
+      let tasks = [
+        mainPage.setViewport({
+          width,
+
+          height,
+        }),
+      ];
+
+      const { length: extraPagesCount } = otherPages || [];
+
+      if (extraPagesCount) {
+        log('log', `extra pages count: ${extraPagesCount}`);
       }
-    }
 
-    await sleep(2000);
+      const allPages = [mainPage, ...otherPages];
 
-    await pollPageResourcesInjection();
-  };
+      const injectionTargetPages = focus ? [mainPage] : allPages;
 
-  await pollPageResourcesInjection();
+      tasks.concat(injectionTargetPages.map((page) => injectPageResourcesOnce(page, options)));
+
+      if (focus && extraPagesCount) {
+        log('log', `focus mode: page "${await getPageTitleExcerpt(mainPage)}" taken to front`);
+
+        tasks.push(mainPage.bringToFront());
+
+        tasks = tasks.concat(otherPages.map(triggerPageClose));
+      }
+
+      await Promise.all(tasks);
+
+      // continue
+      return true;
+    },
+
+    loopIntervalTime,
+
+    ({ message }) => {
+      if (message.includes('Execution context was destroyed')) {
+        log('log', 'page reload');
+
+        // continue
+        return true;
+      }
+
+      log('error', `unhandled error "${message}", aborting`);
+
+      // break
+      return false;
+    },
+  );
 };
 
 module.exports = launchBrowser;

@@ -4,16 +4,26 @@ const getHandledElementUnderBoundingRect = require('./get-handled-element-focusa
 const hasButtonPressed = require('./has-button-pressed');
 const log = require('./log');
 const triggerPageNavigation = require('./trigger-page-navigation');
+const triggerPageScroll = require('./trigger-page-scroll');
+const getHandledElementPropValue = require('./get-handled-element-prop-value');
+const queryPage = require('./query-page');
 
-const {
-  INT_MS_THROTTLE_DELAY,
-} = require('./constants');
-const setPageInjectionFlag = require('./set-page-injection-flag');
+const { INT_MS_THROTTLE_DELAY } = require('./constants');
+const triggerHandledElementMethod = require('./trigger-handled-element-method');
+const getBoundingRectCenterPoint = require('./get-bounding-rect-center-point');
 
-const injectPageResources = async (page, css, js) => {
-  log('log', '0');
+const INT_SCROLL_DELTA = 250;
 
-  await setPageInjectionFlag(page, true);
+const injectPageResources = async (page, options) => {
+  const {
+    width,
+
+    height,
+
+    css,
+
+    js,
+  } = options || {};
 
   log('log', '1');
 
@@ -26,79 +36,141 @@ const injectPageResources = async (page, css, js) => {
   log('log', '2');
 
   try {
-    await Promise.all([
-      page.exposeFunction('gamepadButtonPressHandler', throttle(async (detail) => {
-        log('log', 'gamepadButtonPressHandler');
+    await page.exposeFunction('gamepadButtonPressHandler', throttle(async (detail, support) => {
+      const { gamepadPointer } = support || {};
 
-        const hasButtonPressedA = hasButtonPressed(detail, 'a');
+      const { activeDeferred: isActivePointer, boundingRect } = gamepadPointer || {};
 
-        if (hasButtonPressedA) {
-          const element = await page.$('*:focus');
+      const [pointerX, pointerY] = getBoundingRectCenterPoint(boundingRect);
 
-          if (element) {
-            await element.click();
-          }
+      const elementPointer = await getHandledElementUnderBoundingRect(page, boundingRect);
+      const [elementActive] = await queryPage(page, '*:focus');
 
-          return;
-        }
+      let elementClickable = isActivePointer ? elementPointer : elementActive;
+      elementClickable = elementClickable || elementPointer;
 
-        const hasButtonPressedL1 = hasButtonPressed(detail, 'l1');
-        const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
-        const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
-        const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
+      const hasButtonPressedA = hasButtonPressed(detail, 'a');
+      const hasButtonPressedAnalogLeft = hasButtonPressed(detail, 'analogleft');
+      const hasButtonPressedAnalogRight = hasButtonPressed(detail, 'analogright');
+      const hasButtonPressedAnalog = hasButtonPressedAnalogLeft || hasButtonPressedAnalogRight;
+      const hasButtonPressedL1 = hasButtonPressed(detail, 'l1');
+      const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
+      const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
+      const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
 
-        if (
-          hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2
-        ) {
-          await triggerPageNavigation(page, 0, true);
+      const elementClickableTag = await getHandledElementPropValue(elementClickable, 'tagName');
 
-          return;
-        }
+      log('log', 'button press', elementClickableTag);
 
-        if (hasButtonPressedL1 && hasButtonPressedL2) {
-          await triggerPageNavigation(page, -1, true);
+      if (isActivePointer) {
+        log('log', `mouse moved to ${pointerX} ${pointerY}`);
 
-          return;
-        }
+        await page.mouse.move(pointerX, pointerY);
+      }
 
-        if (hasButtonPressedR1 && hasButtonPressedR2) {
-          await triggerPageNavigation(page, 1, true);
+      if (hasButtonPressedA && elementClickableTag === 'IFRAME') {
+        log('log', `iframe navigation ${elementClickableTag}`);
 
-          return;
-        }
+        await page.goto(await getHandledElementPropValue(elementClickable, 'src'));
 
-        if (hasButtonPressedR1) {
-          await triggerPageTabNavigation(page, false);
+        return;
+      }
 
-          return;
-        }
+      if (hasButtonPressedA && elementClickableTag) {
+        log('log', `click ${elementClickableTag}`);
 
-        if (hasButtonPressedL1) {
-          await triggerPageTabNavigation(page, true);
-        }
-      }, INT_MS_THROTTLE_DELAY)),
+        await triggerHandledElementMethod(elementClickable, 'click');
 
-      page.exposeFunction('gamepadPointerSelectionHandler', throttle(async (detail) => {
-        log('log', 'gamepadPointerSelectionHandler');
+        return;
+      }
 
-        const closestElement = await getHandledElementUnderBoundingRect(page, detail);
+      if (hasButtonPressedAnalog && isActivePointer && elementPointer) {
+        log('log', `focus ${await getHandledElementPropValue(elementPointer, 'tagName')}`);
 
-        if (closestElement) {
-          await closestElement.focus();
-        }
-      }, INT_MS_THROTTLE_DELAY)),
-    ]);
+        await triggerHandledElementMethod(elementPointer, 'focus');
+
+        return;
+      }
+
+      if (hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2) {
+        log('log', 'page reload');
+
+        await triggerPageNavigation(page, 0, true);
+
+        return;
+      }
+
+      if (hasButtonPressedL1 && hasButtonPressedL2) {
+        log('log', 'history: go back');
+
+        await triggerPageNavigation(page, -1, true);
+
+        return;
+      }
+
+      if (hasButtonPressedR1 && hasButtonPressedR2) {
+        log('log', 'history: go forward');
+
+        await triggerPageNavigation(page, 1, true);
+
+        return;
+      }
+
+      if (hasButtonPressedR1) {
+        log('log', 'tab navigation: go right');
+
+        await triggerPageTabNavigation(page, false);
+
+        return;
+      }
+
+      if (hasButtonPressedL1) {
+        log('log', 'tab navigation: go back');
+
+        await triggerPageTabNavigation(page, true);
+
+        return;
+      }
+
+      if (hasButtonPressedR2) {
+        log('log', 'scroll down');
+
+        await triggerPageScroll(
+          page,
+
+          width,
+
+          height,
+
+          { deltaY: INT_SCROLL_DELTA },
+        );
+
+        return;
+      }
+
+      if (hasButtonPressedL2) {
+        log('log', 'scroll top');
+
+        await triggerPageScroll(
+          page,
+
+          width,
+
+          height,
+
+          { deltaY: -INT_SCROLL_DELTA },
+        );
+      }
+    }, INT_MS_THROTTLE_DELAY));
 
     log('log', '3');
   } catch (e) {
     log('log', 'exposed function were already present');
   }
 
-  await page.evaluate(`
-    window.addEventListener('gamepadpointerselection', ({ detail }) => window.gamepadPointerSelectionHandler(detail));
-    
+  await page.evaluate(`    
     window.addEventListener('gamepadbuttonpress', ({ detail }) => {
-      window.gamepadButtonPressHandler(JSON.parse(JSON.stringify(detail)));
+      window.gamepadButtonPressHandler(detail, window.pkgBrowserGamepadRuntime);
     }); 
   `);
 

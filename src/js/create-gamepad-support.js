@@ -160,7 +160,7 @@ const createGamepadSupport = (client) => {
     removeEventListener('gamepaddisconnected', gamepadDisconnectedHandler);
   };
 
-  return destroy;
+  return { destroy };
 };
 
 module.exports = createGamepadSupport;

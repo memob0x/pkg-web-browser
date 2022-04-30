@@ -8,32 +8,32 @@ const getHandledElementFocusableUnderBoundingRect = async (page, boundingRect) =
 
   const focusableElementsGroups = await queryPageFocusableHandledElementsGroups(page);
 
-  return focusableElementsGroups.reduce(async (formerValue, focusableElementsGroup, index) => {
+  return focusableElementsGroups.reduce(async (formerValue, focusableElementsGroup) => {
     const formerValueResolved = await formerValue;
 
     const hasFormerValue = !!formerValueResolved;
-
-    if (hasFormerValue && index === 1) {
-      log('log', 'in focus trap');
-    }
 
     if (hasFormerValue) {
       return formerValue;
     }
 
-    if (index === 1) {
-      log('log', 'not in focus trap');
-    }
+    const { name, value } = focusableElementsGroup;
 
     const closestElement = await getHandledElementUnderBoundingRect(
-      focusableElementsGroup,
+      value,
 
       centerPoint,
 
       boundingRect,
     );
 
-    return closestElement || formerValueResolved;
+    if (closestElement) {
+      log('log', name);
+
+      return closestElement;
+    }
+
+    return formerValueResolved;
   }, Promise.resolve(null));
 };
 
