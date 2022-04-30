@@ -1,11 +1,10 @@
 const puppeteer = require('puppeteer');
 const getPageTitleExcerpt = require('./get-page-title-excerpt');
-const hasPageInjectedResources = require('./has-page-injected-resources');
 const identifyPages = require('./identify-pages');
-const injectPageResources = require('./inject-page-resources');
+const injectPageResourcesOnce = require('./inject-page-resources-once');
 const log = require('./log');
 const loop = require('./loop');
-const setPageInjectionFlag = require('./set-page-injection-flag');
+const triggerPageClose = require('./trigger-page-close');
 
 const launchBrowser = async (url, options) => {
   const {
@@ -84,32 +83,14 @@ const launchBrowser = async (url, options) => {
 
       const injectionTargetPages = focus ? [mainPage] : allPages;
 
-      tasks.concat(injectionTargetPages.map(async (page) => {
-        const isInjected = await hasPageInjectedResources(page);
-
-        log('log', `page "${await getPageTitleExcerpt(page)}" injection:`, isInjected);
-
-        if (!isInjected) {
-          await setPageInjectionFlag(page, true);
-
-          log('log', 'injecting');
-
-          await injectPageResources(page, options);
-
-          log('log', 'injected');
-        }
-      }));
+      tasks.concat(injectionTargetPages.map((page) => injectPageResourcesOnce(page, options)));
 
       if (focus && extraPagesCount) {
         log('log', `focus mode: page "${await getPageTitleExcerpt(mainPage)}" taken to front`);
 
         tasks.push(mainPage.bringToFront());
 
-        tasks = tasks.concat(otherPages.map(async (page) => {
-          log('log', `focus mode: page "${await getPageTitleExcerpt(page)}" closed`);
-
-          return page.close();
-        }));
+        tasks = tasks.concat(otherPages.map(triggerPageClose));
       }
 
       await Promise.all(tasks);
