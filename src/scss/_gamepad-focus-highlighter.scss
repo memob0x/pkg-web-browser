@@ -5,10 +5,10 @@
 
   top: 0;
   left: 0;
-  width: calc(var(--gamepad-focus-highlighter-width) + 20px);
-  height: calc(var(--gamepad-focus-highlighter-height) + 20px);
+  width: calc(var(--gamepad-focus-highlighter-width, 0));
+  height: calc(var(--gamepad-focus-highlighter-height, 0));
 
-  transform: translateX(calc(var(--gamepad-focus-highlighter-left) - 20px)) translateY(calc(var(--gamepad-focus-highlighter-top) - 20px));
+  transform: translateX(calc(var(--gamepad-focus-highlighter-left, 0))) translateY(calc(var(--gamepad-focus-highlighter-top, 0)));
 
   z-index: 99999;
 
