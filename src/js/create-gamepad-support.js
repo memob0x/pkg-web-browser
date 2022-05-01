@@ -17,7 +17,7 @@ const buttonNames = {
   10: 'analogleft',
   11: 'analogright',
 
-  12: 'dpadtop',
+  12: 'dpadup',
   13: 'dpaddown',
   14: 'dpadleft',
   15: 'dpadright',

@@ -4,7 +4,7 @@ const transpileScss = (file) => new Promise((resolve, reject) => {
   sass.render({
     file,
 
-    outputStyle: 'compressed',
+    outputStyle: 'nested',
   }, (error, result) => {
     const { css } = result || {};
 

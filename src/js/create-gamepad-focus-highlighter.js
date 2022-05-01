@@ -9,9 +9,9 @@ const createGamepadFocusHighlighter = (client) => {
     removeEventListener,
   } = client;
 
-  const highlighter = document.createElement('div');
+  const element = document.createElement('div');
 
-  const { classList } = highlighter;
+  const { classList } = element;
 
   classList.add('gamepad-focus-highlighter');
 
@@ -24,8 +24,8 @@ const createGamepadFocusHighlighter = (client) => {
       return;
     }
 
-    if (!body.contains(highlighter)) {
-      body.append(highlighter);
+    if (!body.contains(element)) {
+      body.append(element);
     }
 
     const { documentElement, activeElement } = document;
@@ -33,26 +33,34 @@ const createGamepadFocusHighlighter = (client) => {
     const { style } = documentElement;
 
     const {
-      top,
+      top: activeElementTop,
 
-      left,
+      left: activeElementLeft,
 
-      width,
+      width: activeElementWidth,
 
-      height,
+      height: activeElementHeight,
     } = activeElement.getBoundingClientRect();
 
-    style.setProperty('--gamepad-focus-highlighter-top', `${top}px`);
-    style.setProperty('--gamepad-focus-highlighter-left', `${left}px`);
-    style.setProperty('--gamepad-focus-highlighter-width', `${width}px`);
-    style.setProperty('--gamepad-focus-highlighter-height', `${height}px`);
+    style.setProperty('--gamepad-focus-highlighter-top', `${activeElementTop}px`);
+    style.setProperty('--gamepad-focus-highlighter-left', `${activeElementLeft}px`);
+    style.setProperty('--gamepad-focus-highlighter-width', `${activeElementWidth}px`);
+    style.setProperty('--gamepad-focus-highlighter-height', `${activeElementHeight}px`);
 
-    const { clientWidth, clientHeight } = documentElement;
+    const {
+      top: bodyTop,
 
-    const isFullScreen = top === 0
-    && left === 0
-    && width === clientWidth
-    && height === clientHeight;
+      left: bodyLeft,
+
+      width: bodyWidth,
+
+      height: bodyHeight,
+    } = body.getBoundingClientRect();
+
+    const isFullScreen = activeElementTop === bodyTop
+      && activeElementLeft === bodyLeft
+      && activeElementWidth === bodyWidth
+      && activeElementHeight === bodyHeight;
 
     classList[isFullScreen ? 'add' : 'remove']('gamepad-focus-highlighter--full-screen');
     classList[isFullScreen ? 'remove' : 'add']('gamepad-focus-highlighter--not-full-screen');
@@ -75,6 +83,8 @@ const createGamepadFocusHighlighter = (client) => {
 
   const destroy = () => {
     hasBeenDestroyed = true;
+
+    element.remove();
 
     removeEventListener('scroll', update);
     removeEventListener('resize', update);

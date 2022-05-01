@@ -31,20 +31,22 @@
   "author": "memob0x",
   "license": "MIT",
   "dependencies": {
-    "@babel/core": "^7.17.9",
+    "@babel/core": "^7.17.10",
     "@babel/eslint-parser": "^7.17.0",
     "@babel/eslint-plugin": "^7.17.7",
     "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-node-resolve": "^13.2.1",
     "argv": "^0.0.2",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsdoc": "^39.2.8",
+    "eslint-plugin-jsdoc": "^39.2.9",
     "globby": "^13.1.1",
     "husky": "^7.0.4",
     "node-sass": "^7.0.1",
     "pkg": "^5.6.0",
-    "puppeteer": "^13.6.0",
-    "rollup": "^2.70.2"
-  }
+    "puppeteer": "^13.7.0",
+    "rollup": "^2.71.1",
+    "simple-keyboard": "^3.4.91"
+   }
 }

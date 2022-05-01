@@ -1,9 +1,10 @@
 .gamepad-pointer {
   position: fixed;
+  
   top: var(--gamepad-pointer-top);
   left: var(--gamepad-pointer-left);
 
-  z-index: 99999;
+  z-index: 99998;
   width: 210px;
 
   transform: scale(0);

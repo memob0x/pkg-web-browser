@@ -1,31 +1,25 @@
 const throttle = require('./throttle');
-const triggerPageTabNavigation = require('./trigger-page-tab-navigation');
+const triggerPageKeyPress = require('./trigger-page-keypress');
 const getHandledElementUnderBoundingRect = require('./get-handled-element-focusable-under-bounding-rect');
 const hasButtonPressed = require('./has-button-pressed');
 const log = require('./log');
 const triggerPageNavigation = require('./trigger-page-navigation');
-const triggerPageScroll = require('./trigger-page-scroll');
 const getHandledElementPropValue = require('./get-handled-element-prop-value');
 const queryPage = require('./query-page');
-
-const { INT_MS_THROTTLE_DELAY } = require('./constants');
 const triggerHandledElementMethod = require('./trigger-handled-element-method');
 const getBoundingRectCenterPoint = require('./get-bounding-rect-center-point');
+const triggerPageClose = require('./trigger-page-close');
 
-const INT_SCROLL_DELTA = 250;
+const { INT_MS_THROTTLE_DELAY } = require('./constants');
 
 const injectPageResources = async (page, options) => {
   const {
-    width,
-
-    height,
-
     css,
 
     js,
   } = options || {};
 
-  log('log', '1');
+  log('log', 'files injection: start');
 
   await Promise.all([
     page.addStyleTag({ content: css }),
@@ -33,7 +27,9 @@ const injectPageResources = async (page, options) => {
     page.addScriptTag({ content: js }),
   ]);
 
-  log('log', '2');
+  log('log', 'files injection: ok');
+
+  log('log', 'handlers injection: start');
 
   try {
     await page.exposeFunction('gamepadButtonPressHandler', throttle(async (detail, support) => {
@@ -57,10 +53,30 @@ const injectPageResources = async (page, options) => {
       const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
       const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
       const hasButtonPressedR2 = hasButtonPressed(detail, 'r2');
+      const hasButtonPressedStart = hasButtonPressed(detail, 'start');
+      const hasButtonPressedSelect = hasButtonPressed(detail, 'select');
+
+      const hasButtonPressedDPadUp = hasButtonPressed(detail, 'dpadup');
+      const hasButtonPressedDPadDown = hasButtonPressed(detail, 'dpaddown');
+      const hasButtonPressedDPadLeft = hasButtonPressed(detail, 'dpadleft');
+      const hasButtonPressedDPadRight = hasButtonPressed(detail, 'dpadright');
 
       const elementClickableTag = await getHandledElementPropValue(elementClickable, 'tagName');
 
-      log('log', 'button press', elementClickableTag);
+      const isElementClickable = !!elementClickableTag;
+      const isElementClickableIframe = isElementClickable && elementClickableTag === 'IFRAME';
+
+      log('log', '---------------------------------------------------------------');
+
+      log('log', 'button press, clickable element tagName:', elementClickableTag);
+
+      if (hasButtonPressedStart && hasButtonPressedSelect) {
+        await triggerPageClose(page);
+
+        log('log', '---------------------------------------------------------------');
+
+        return;
+      }
 
       if (isActivePointer) {
         log('log', `mouse moved to ${pointerX} ${pointerY}`);
@@ -68,105 +84,148 @@ const injectPageResources = async (page, options) => {
         await page.mouse.move(pointerX, pointerY);
       }
 
-      if (hasButtonPressedA && elementClickableTag === 'IFRAME') {
-        log('log', `iframe navigation ${elementClickableTag}`);
+      if (hasButtonPressedA && isElementClickableIframe) {
+        log('log', `button press: A, iframe navigation ${elementClickableTag}`);
 
         await page.goto(await getHandledElementPropValue(elementClickable, 'src'));
+
+        log('log', '---------------------------------------------------------------');
 
         return;
       }
 
-      if (hasButtonPressedA && elementClickableTag) {
-        log('log', `click ${elementClickableTag}`);
+      if (hasButtonPressedA && isElementClickable && !isActivePointer) {
+        log('log', `button press: A, selection (enter key) on ${elementClickableTag}`);
+
+        await triggerPageKeyPress(page, 'Enter');
+
+        log('log', '---------------------------------------------------------------');
+
+        return;
+      }
+
+      if (hasButtonPressedA && isElementClickable && isActivePointer) {
+        log('log', `button press A, click ${elementClickableTag}`);
 
         await triggerHandledElementMethod(elementClickable, 'click');
+
+        log('log', '---------------------------------------------------------------');
 
         return;
       }
 
       if (hasButtonPressedAnalog && isActivePointer && elementPointer) {
-        log('log', `focus ${await getHandledElementPropValue(elementPointer, 'tagName')}`);
+        log('log', `button press Analog, focus ${await getHandledElementPropValue(elementPointer, 'tagName')}`);
 
         await triggerHandledElementMethod(elementPointer, 'focus');
+
+        log('log', '---------------------------------------------------------------');
 
         return;
       }
 
       if (hasButtonPressedL1 && hasButtonPressedL2 && hasButtonPressedR1 && hasButtonPressedR2) {
-        log('log', 'page reload');
+        log('log', 'button press l1+l2+r1+r2, page reload');
 
         await triggerPageNavigation(page, 0, true);
+
+        log('log', '---------------------------------------------------------------');
 
         return;
       }
 
       if (hasButtonPressedL1 && hasButtonPressedL2) {
-        log('log', 'history: go back');
+        log('log', 'button press l1 + l2, history: go back');
 
         await triggerPageNavigation(page, -1, true);
+
+        log('log', '---------------------------------------------------------------');
 
         return;
       }
 
       if (hasButtonPressedR1 && hasButtonPressedR2) {
-        log('log', 'history: go forward');
+        log('log', 'button press r1 + r2, history: go forward');
 
         await triggerPageNavigation(page, 1, true);
+
+        log('log', '---------------------------------------------------------------');
 
         return;
       }
 
       if (hasButtonPressedR1) {
-        log('log', 'tab navigation: go right');
+        log('log', 'button press r1, tab navigation: go right');
 
-        await triggerPageTabNavigation(page, false);
+        await triggerPageKeyPress(page, 'Tab');
+
+        log('log', '---------------------------------------------------------------');
 
         return;
       }
 
       if (hasButtonPressedL1) {
-        log('log', 'tab navigation: go back');
+        log('log', 'button press l1, tab navigation: go back');
 
-        await triggerPageTabNavigation(page, true);
+        await Promise.all([
+          triggerPageKeyPress(page, 'Shift'),
 
-        return;
-      }
+          triggerPageKeyPress(page, 'Tab'),
+        ]);
 
-      if (hasButtonPressedR2) {
-        log('log', 'scroll down');
-
-        await triggerPageScroll(
-          page,
-
-          width,
-
-          height,
-
-          { deltaY: INT_SCROLL_DELTA },
-        );
+        log('log', '---------------------------------------------------------------');
 
         return;
       }
 
-      if (hasButtonPressedL2) {
-        log('log', 'scroll top');
+      if (hasButtonPressedDPadUp) {
+        log('log', 'button press dpadup, arrow up');
 
-        await triggerPageScroll(
-          page,
+        await triggerPageKeyPress(page, 'ArrowUp');
 
-          width,
+        log('log', '---------------------------------------------------------------');
 
-          height,
-
-          { deltaY: -INT_SCROLL_DELTA },
-        );
+        return;
       }
+
+      if (hasButtonPressedDPadRight) {
+        log('log', 'button press dpadright, arrow right');
+
+        await triggerPageKeyPress(page, 'ArrowRight');
+
+        log('log', '---------------------------------------------------------------');
+
+        return;
+      }
+      if (hasButtonPressedDPadDown) {
+        log('log', 'button press dpaddown, arrow down');
+
+        await triggerPageKeyPress(page, 'ArrowDown');
+
+        log('log', '---------------------------------------------------------------');
+
+        return;
+      }
+
+      if (hasButtonPressedDPadLeft) {
+        log('log', 'button press dpadleft, arrow left');
+
+        await triggerPageKeyPress(page, 'ArrowLeft');
+
+        log('log', '---------------------------------------------------------------');
+
+        return;
+      }
+
+      log('log', 'button press not handled');
     }, INT_MS_THROTTLE_DELAY));
 
-    log('log', '3');
+    log('log', 'handlers injection: ok');
   } catch (e) {
-    log('log', 'exposed function were already present');
+    log('log', 'handlers injection: ok, skip (handlers were already present)');
   }
+
+  log('log', 'events injection: start');
 
   await page.evaluate(`    
     window.addEventListener('gamepadbuttonpress', ({ detail }) => {
@@ -174,7 +233,7 @@ const injectPageResources = async (page, options) => {
     }); 
   `);
 
-  log('log', '4');
+  log('log', 'events injection: ok');
 };
 
 module.exports = injectPageResources;

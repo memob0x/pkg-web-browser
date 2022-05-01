@@ -16,6 +16,10 @@ const focusableClickableTags = [
 
 const focusableSelectorAll = focusableClickableTags.map((x) => `${x}:not([tabindex="-1"], [disabled])`);
 
+// FIXME: since "focus-trap" can be implemented in differend ways
+// we need to find a better way to achieve the preferred focused elements,
+// ideally the best way should detect which elements "visually" focusable
+// by detecting which layer is above the others, which is display: none etc...
 const focusableSelectorTrapped = focusableSelectorAll.map((x) => `[tabindex="-1"]:not(${focusableClickableTags}) ${x}`);
 
 const queryElementsInNamedObj = async (page, selector, name) => ({

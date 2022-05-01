@@ -1,4 +1,5 @@
 const commonjs = require('@rollup/plugin-commonjs');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
 
 const { resolve } = require('path');
 const { writeFile } = require('fs/promises');
@@ -15,11 +16,17 @@ const buildStyle = async () => writeFile(
 const bundleScripts = async () => {
   const input = await rollup({
     input: './src/assets/scripts.js',
-    plugins: [commonjs()],
+
+    plugins: [
+      commonjs(),
+
+      nodeResolve(),
+    ],
   });
 
   const { output } = await input.generate({
     format: 'iife',
+
     name: 'pkgBrowserGamepadRuntime',
   });
 
