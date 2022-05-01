@@ -29,11 +29,17 @@ const injectPageResources = async (page, options) => {
 
   log('log', 'files injection: ok');
 
-  log('log', 'handlers injection: start');
+  log('log', 'handler gamepadButtonPress: start');
 
   try {
     await page.exposeFunction('gamepadButtonPressHandler', throttle(async (detail, support) => {
-      const { gamepadPointer } = support || {};
+      const { gamepadPointer, gamepadVirtualKeyboard } = support || {};
+
+      const { activeDeferred: isActiveKeyboard } = gamepadVirtualKeyboard || {};
+
+      if (isActiveKeyboard) {
+        return;
+      }
 
       const { activeDeferred: isActivePointer, boundingRect } = gamepadPointer || {};
 
@@ -220,17 +226,33 @@ const injectPageResources = async (page, options) => {
       log('log', 'button press not handled');
     }, INT_MS_THROTTLE_DELAY));
 
-    log('log', 'handlers injection: ok');
+    log('log', 'handler gamepadButtonPress: ok');
   } catch (e) {
-    log('log', 'handlers injection: ok, skip (handlers were already present)');
+    log('log', 'handler gamepadButtonPress: ok, skip (handlers were already present)');
+  }
+
+  log('log', 'handler virtualKeyboardKeypress injection: start');
+
+  try {
+    await page.exposeFunction('virtualKeyboardKeypressHandler', async (detail) => {
+      await triggerPageKeyPress(page, detail);
+    });
+
+    log('log', 'handler virtualKeyboardKeypress injection: ok');
+  } catch (e) {
+    log('log', 'handler virtualKeyboardKeypress injection: ok, skip (handler was already present)');
   }
 
   log('log', 'events injection: start');
 
-  await page.evaluate(`    
+  await page.evaluate(`
     window.addEventListener('gamepadbuttonpress', ({ detail }) => {
       window.gamepadButtonPressHandler(detail, window.pkgBrowserGamepadRuntime);
-    }); 
+    });
+
+    window.addEventListener('virtualkeyboardkeypress', ({ detail }) => {
+      window.virtualKeyboardKeypressHandler(detail, window.pkgBrowserGamepadRuntime);
+    });
   `);
 
   log('log', 'events injection: ok');

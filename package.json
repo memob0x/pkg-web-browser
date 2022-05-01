@@ -47,6 +47,7 @@
     "pkg": "^5.6.0",
     "puppeteer": "^13.7.0",
     "rollup": "^2.71.1",
-    "simple-keyboard": "^3.4.91"
-   }
+    "simple-keyboard": "^3.4.91",
+    "simple-keyboard-key-navigation": "^2.4.143"
+  }
 }

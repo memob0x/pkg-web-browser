@@ -1,29 +1,37 @@
 const identifyPages = async (browser) => {
-  const [mainPage, ...otherPages] = await browser.pages();
+  const pages = await browser.pages();
 
-  const otherPagesFiltered = await otherPages.reduce(
-    async (accumulator, page) => {
+  return pages.reduce(
+    async (accumulator, page, index) => {
       const title = await page.title();
 
       if (title.startsWith('DevTools')) {
         return accumulator;
       }
 
-      const accumulatorResolved = await accumulator;
+      const identifiedPages = await accumulator;
 
-      accumulatorResolved.push(page);
+      let { main } = identifiedPages;
 
-      return accumulatorResolved;
+      const { other } = identifiedPages;
+
+      if (!index) {
+        main = !main ? page : main;
+
+        return { main, other };
+      }
+
+      other.push(page);
+
+      return { main, other };
     },
 
-    Promise.resolve([]),
+    Promise.resolve({
+      main: null,
+
+      other: [],
+    }),
   );
-
-  return [
-    mainPage,
-
-    otherPagesFiltered,
-  ];
 };
 
 module.exports = identifyPages;

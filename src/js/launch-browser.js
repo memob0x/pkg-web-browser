@@ -56,7 +56,11 @@ const launchBrowser = async (url, options) => {
 
   return loop(
     async () => {
-      const [mainPage, otherPages] = await identifyPages(browser);
+      const {
+        main: mainPage,
+
+        other: otherPages,
+      } = await identifyPages(browser);
 
       if (!mainPage) {
         log('error', 'no page found');
