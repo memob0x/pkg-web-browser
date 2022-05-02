@@ -1,4 +1,4 @@
-const { INT_MS_THROTTLE_DELAY } = require('./constants');
+const { INT_MS_THROTTLE_DELAY_LONG } = require('./constants');
 const hasButtonPressed = require('./has-button-pressed');
 const throttle = require('./throttle');
 
@@ -70,7 +70,7 @@ const createGamepadPointer = (client) => {
     }
 
     activate();
-  }, INT_MS_THROTTLE_DELAY);
+  }, INT_MS_THROTTLE_DELAY_LONG);
 
   const gamepadAnalogMoveHandler = ({ detail }) => {
     if (!isActive()) {

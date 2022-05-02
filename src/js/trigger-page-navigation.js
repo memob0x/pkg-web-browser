@@ -1,49 +1,69 @@
-const reload = async (page, inBrowser) => {
-  if (inBrowser) {
-    await page.evaluate('window.location.reload();');
+const log = require('./log');
 
-    return;
+const reload = async (page) => {
+  try {
+    log('log', 'reload: start');
+
+    const value = await page.reload();
+
+    log('log', 'reload: ok');
+
+    return value;
+  } catch (e) {
+    log('error', 'error during reload attempt');
+
+    return null;
   }
-
-  await page.reload();
 };
 
-const goForward = async (page, inBrowser) => {
-  if (inBrowser) {
-    await page.evaluate('window.history.forward()');
+const goForward = async (page) => {
+  try {
+    log('log', 'go forward: start');
 
-    return;
+    const value = await page.goForward();
+
+    log('log', 'go forward: ok');
+
+    return value;
+  } catch (e) {
+    log('error', 'error during go forward attempt');
+
+    return null;
   }
-
-  await page.goForward();
 };
 
-const goBack = async (page, inBrowser) => {
-  if (inBrowser) {
-    await page.evaluate('window.history.back();');
+const goBack = async (page) => {
+  try {
+    log('log', 'go back: start');
 
-    return;
+    const value = await page.goBack();
+
+    log('log', 'go back: ok');
+
+    return value;
+  } catch (e) {
+    log('error', 'error during go back attempt');
+
+    return null;
   }
-
-  await page.goBack();
 };
 
-const triggerPageNavigation = async (page, direction, inBrowser) => {
+const triggerPageNavigation = async (page, direction) => {
   if (!direction) {
-    await reload(page, inBrowser);
-
-    return;
+    return reload(page);
   }
 
   if (direction > 0) {
-    await goForward(page, inBrowser);
-
-    return;
+    return goForward(page);
   }
 
   if (direction < 0) {
-    await goBack(page, inBrowser);
+    return goBack(page);
   }
+
+  log('error', `unrecognized direction ${direction}`);
+
+  return null;
 };
 
 module.exports = triggerPageNavigation;

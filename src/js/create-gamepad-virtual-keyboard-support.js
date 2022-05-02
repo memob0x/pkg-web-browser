@@ -3,7 +3,7 @@ const { default: KeyNavigator } = require('simple-keyboard-key-navigation');
 const hasButtonPressed = require('./has-button-pressed');
 const throttle = require('./throttle');
 
-const { INT_MS_THROTTLE_DELAY } = require('./constants');
+const { INT_MS_THROTTLE_DELAY_LONG } = require('./constants');
 
 // {bksp} {tab} {lock} {shift}...
 const keyboardLayout = [
@@ -220,7 +220,7 @@ const createGamepadVirtualKeyboardSupport = (client) => {
     if (isA) {
       KeyNavigatorModule.press();
     }
-  }, INT_MS_THROTTLE_DELAY);
+  }, INT_MS_THROTTLE_DELAY_LONG);
 
   addEventListener('gamepadbuttonpress', buttonPressHandler);
 
