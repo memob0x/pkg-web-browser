@@ -1,4 +1,4 @@
-const { BOOL_LOG_LEVEL } = require('./constants');
+import { BOOL_LOG_LEVEL } from './constants';
 
 const log = (type, ...args) => {
   const isError = type === 'error';
@@ -24,4 +24,4 @@ const log = (type, ...args) => {
   return true;
 };
 
-module.exports = log;
+export default log;

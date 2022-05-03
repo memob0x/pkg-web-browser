@@ -1,4 +1,4 @@
-const log = require('./log');
+import log from './log';
 
 const evaluatePageCode = async (page, code) => {
   try {
@@ -16,4 +16,4 @@ const evaluatePageCode = async (page, code) => {
   }
 };
 
-module.exports = evaluatePageCode;
+export default evaluatePageCode;

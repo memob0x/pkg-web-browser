@@ -1,4 +1,4 @@
-const log = require('./log');
+import log from './log';
 
 const triggerHandledElementMethod = async (element, method) => {
   try {
@@ -8,4 +8,4 @@ const triggerHandledElementMethod = async (element, method) => {
   }
 };
 
-module.exports = triggerHandledElementMethod;
+export default triggerHandledElementMethod;

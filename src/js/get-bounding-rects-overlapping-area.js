@@ -34,4 +34,4 @@ const getBoundingRectsOverlappingArea = (boundingRectA, boundingRectB) => {
   return x * y;
 };
 
-module.exports = getBoundingRectsOverlappingArea;
+export default getBoundingRectsOverlappingArea;

@@ -1,7 +1,7 @@
-const getBoundingRectCenterPoint = require('./get-bounding-rect-center-point');
-const queryPageFocusableHandledElementsGroups = require('./query-page-focusable-handled-elements-groups');
-const getHandledElementUnderBoundingRect = require('./get-handled-element-under-bounding-rect');
-const log = require('./log');
+import getBoundingRectCenterPoint from './get-bounding-rect-center-point';
+import queryPageFocusableHandledElementsGroups from './query-page-focusable-handled-elements-groups';
+import getHandledElementUnderBoundingRect from './get-handled-element-under-bounding-rect';
+import log from './log';
 
 const getHandledElementFocusableUnderBoundingRect = async (page, boundingRect) => {
   const centerPoint = getBoundingRectCenterPoint(boundingRect);
@@ -37,4 +37,4 @@ const getHandledElementFocusableUnderBoundingRect = async (page, boundingRect) =
   }, Promise.resolve(null));
 };
 
-module.exports = getHandledElementFocusableUnderBoundingRect;
+export default getHandledElementFocusableUnderBoundingRect;

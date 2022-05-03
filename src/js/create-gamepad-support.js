@@ -1,4 +1,4 @@
-const roundDecimals = require('./round-decimals');
+import roundDecimals from './round-decimals';
 
 const buttonNames = {
   0: 'b',
@@ -163,4 +163,4 @@ const createGamepadSupport = (client) => {
   return { destroy };
 };
 
-module.exports = createGamepadSupport;
+export default createGamepadSupport;

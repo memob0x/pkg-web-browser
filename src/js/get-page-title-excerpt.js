@@ -16,4 +16,4 @@ const getPageTitleExcerpt = async (page) => {
   }
 };
 
-module.exports = getPageTitleExcerpt;
+export default getPageTitleExcerpt;

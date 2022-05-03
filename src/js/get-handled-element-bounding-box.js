@@ -14,4 +14,4 @@ const getHandledElementBoundingBox = async (handledElement) => {
   return getHandledElementBoundingBox(await handledElement.$('div'));
 };
 
-module.exports = getHandledElementBoundingBox;
+export default getHandledElementBoundingBox;

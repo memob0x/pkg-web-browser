@@ -10,4 +10,4 @@ const convertBoundingBoxToBoundingRect = (boundingBox) => {
   };
 };
 
-module.exports = convertBoundingBoxToBoundingRect;
+export default convertBoundingBoxToBoundingRect;

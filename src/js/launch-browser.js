@@ -1,10 +1,10 @@
-const puppeteer = require('puppeteer');
-const getPageTitleExcerpt = require('./get-page-title-excerpt');
-const identifyPages = require('./identify-pages');
-const injectPageResourcesOnce = require('./inject-page-resources-once');
-const log = require('./log');
-const loop = require('./loop');
-const triggerPageClose = require('./trigger-page-close');
+import puppeteer from 'puppeteer';
+import getPageTitleExcerpt from './get-page-title-excerpt';
+import identifyPages from './identify-pages';
+import injectPageResourcesOnce from './inject-page-resources-once';
+import log from './log';
+import loop from './loop';
+import triggerPageClose from './trigger-page-close';
 
 const launchBrowser = async (url, options) => {
   const {
@@ -121,4 +121,4 @@ const launchBrowser = async (url, options) => {
   );
 };
 
-module.exports = launchBrowser;
+export default launchBrowser;

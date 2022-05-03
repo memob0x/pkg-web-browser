@@ -1,15 +1,17 @@
 {
   "name": "pkg-website-gamepad",
   "version": "0.0.1",
+  "type": "module",
   "description": "Control any website navigation with a gamepad",
-  "main": "index.js",
+  "main": "dist/index.cjs",
   "bin": {
-    "pkg-website-gamepad": "index.js"
+    "pkg-website-gamepad": "dist/index.cjs"
   },
   "scripts": {
-    "build": "node ./build.js",
-    "pkg": "node ./index.js",
-    "test": "",
+    "build": "node --experimental-specifier-resolution=node ./build.js",
+    "pkg": "npm run build && node ./dist/index.cjs",
+    "test:unit": "./node_modules/.bin/mocha --experimental-specifier-resolution=node ./test/unit/*.spec.*",
+    "test": "npm run test:unit",
     "lint": "./node_modules/.bin/eslint --ext .js . --fix",
     "prepare": "husky install"
   },
@@ -35,19 +37,20 @@
     "@babel/eslint-parser": "^7.17.0",
     "@babel/eslint-plugin": "^7.17.7",
     "@rollup/plugin-commonjs": "^22.0.0",
-    "@rollup/plugin-node-resolve": "^13.2.1",
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "argv": "^0.0.2",
+    "chai": "^4.3.6",
     "eslint": "^8.14.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsdoc": "^39.2.9",
-    "globby": "^13.1.1",
     "husky": "^7.0.4",
+    "mocha": "^10.0.0",
     "node-sass": "^7.0.1",
     "pkg": "^5.6.0",
     "puppeteer": "^13.7.0",
     "rollup": "^2.71.1",
-    "simple-keyboard": "^3.4.91",
-    "simple-keyboard-key-navigation": "^2.4.143"
+    "simple-keyboard": "^3.4.93",
+    "simple-keyboard-key-navigation": "^2.4.147"
   }
 }

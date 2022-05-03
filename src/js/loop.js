@@ -1,5 +1,5 @@
-const log = require('./log');
-const sleep = require('./sleep');
+import log from './log';
+import sleep from './sleep';
 
 const loop = async (action, timeout, onError) => {
   try {
@@ -29,4 +29,4 @@ const loop = async (action, timeout, onError) => {
   }
 };
 
-module.exports = loop;
+export default loop;

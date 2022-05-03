@@ -1,4 +1,4 @@
-const log = require('./log');
+import log from './log';
 
 const triggerPageKeyPress = async (page, name) => {
   try {
@@ -16,4 +16,4 @@ const triggerPageKeyPress = async (page, name) => {
   }
 };
 
-module.exports = triggerPageKeyPress;
+export default triggerPageKeyPress;

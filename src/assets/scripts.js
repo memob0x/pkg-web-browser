@@ -1,7 +1,7 @@
-const createGamepadSupport = require('../js/create-gamepad-support');
-const createGamepadPointer = require('../js/create-gamepad-pointer');
-const createGamepadFocusHighlighter = require('../js/create-gamepad-focus-highlighter');
-const createGamepadVirtualKeyboardSupport = require('../js/create-gamepad-virtual-keyboard-support');
+import createGamepadSupport from '../js/create-gamepad-support';
+import createGamepadPointer from '../js/create-gamepad-pointer';
+import createGamepadFocusHighlighter from '../js/create-gamepad-focus-highlighter';
+import createGamepadVirtualKeyboardSupport from '../js/create-gamepad-virtual-keyboard-support';
 
 const gamepadSupport = createGamepadSupport(globalThis);
 
@@ -11,7 +11,7 @@ const gamepadFocusHighlighter = createGamepadFocusHighlighter(globalThis);
 
 const gamepadVirtualKeyboard = createGamepadVirtualKeyboardSupport(globalThis);
 
-module.exports = {
+export default {
   gamepadSupport,
 
   gamepadPointer,

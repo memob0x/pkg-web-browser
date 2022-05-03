@@ -1,12 +1,17 @@
-const argv = require('argv');
+import pkg from 'argv';
 
-const { exec } = require('pkg');
+import { exec } from 'pkg';
 
-const { writeFile, unlink } = require('fs/promises');
-const readFileUtf8 = require('./src/js/read-file-utf8');
-const log = require('./src/js/log');
+import { writeFile, unlink } from 'fs/promises';
 
-const { options, targets } = argv.option([
+import { resolve } from 'path';
+
+import log from './js/log';
+import readFileUtf8 from './js/read-file-utf8';
+
+const { option } = pkg;
+
+const { options, targets } = option([
   {
     name: 'browser-width',
     type: 'int',
@@ -81,24 +86,26 @@ const [
   output = '',
 ] = targets || [];
 
-(async () => {
+const run = async () => {
   const runtimeFilePrefix = 'runtime-';
   const runtimeFileExtension = '.js';
 
   const runtimeFilename = `${runtimeFilePrefix}${performance.now()}${Math.random()}${runtimeFileExtension}`;
 
-  const runtimeFile = `${__dirname}/${runtimeFilename}`;
+  const runtimeFile = resolve('.', runtimeFilename);
 
   // runtimeCssCodeToBeInjected
-  const css = await readFileUtf8('./dist/style.css');
+  const [css, js] = await Promise.all([
+    readFileUtf8('./dist/style.css'),
 
-  // runtimeJsCodeToBeInjected
-  const js = await readFileUtf8('./dist/scripts.js');
+    // runtimeJsCodeToBeInjected
+    readFileUtf8('./dist/scripts.js'),
+  ]);
 
   await writeFile(
     runtimeFile,
 
-    `require('./src/js/launch-browser')(${JSON.stringify(url)}, ${JSON.stringify({
+    `require('./dist/launch-browser.cjs')(${JSON.stringify(url)}, ${JSON.stringify({
       executablePath,
 
       userDataDir,
@@ -140,9 +147,7 @@ const [
     log('error', e);
   }
 
-  const { globby } = await import('globby');
+  await unlink(`./${runtimeFilename}`);
+};
 
-  const runtimeFiles = await globby(`${runtimeFilePrefix}*${runtimeFileExtension}`);
-
-  await Promise.all(runtimeFiles.map(unlink));
-})();
+run();

@@ -16,4 +16,4 @@ const queryPage = async (page, selector) => {
   return page.$$(selector);
 };
 
-module.exports = queryPage;
+export default queryPage;

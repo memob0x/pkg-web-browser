@@ -16,4 +16,4 @@ const getBoundingRectCenterPoint = (boundingRect) => {
   ];
 };
 
-module.exports = getBoundingRectCenterPoint;
+export default getBoundingRectCenterPoint;

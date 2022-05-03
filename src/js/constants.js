@@ -3,7 +3,7 @@ const INT_MS_THROTTLE_DELAY_LONG = 175;
 const INT_MS_THROTTLE_DELAY_SHORT = 25;
 const STRING_INJECTED_FLAG_NAME = 'hasPuppeteerInjectedResources';
 
-module.exports = {
+export {
   BOOL_LOG_LEVEL,
 
   INT_MS_THROTTLE_DELAY_LONG,

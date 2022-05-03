@@ -1,4 +1,4 @@
-const log = require('./log');
+import log from './log';
 
 const exposePageFunction = async (page, name, fn) => {
   log('log', `handler ${name}: start`);
@@ -12,4 +12,4 @@ const exposePageFunction = async (page, name, fn) => {
   }
 };
 
-module.exports = exposePageFunction;
+export default exposePageFunction;

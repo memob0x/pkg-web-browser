@@ -93,4 +93,4 @@ const createGamepadFocusHighlighter = (client) => {
   return destroy;
 };
 
-module.exports = createGamepadFocusHighlighter;
+export default createGamepadFocusHighlighter;

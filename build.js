@@ -1,41 +1,94 @@
-const commonjs = require('@rollup/plugin-commonjs');
-const { nodeResolve } = require('@rollup/plugin-node-resolve');
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import { resolve } from 'path';
+import { writeFile } from 'fs/promises';
 
-const { resolve } = require('path');
-const { writeFile } = require('fs/promises');
-
-const { rollup } = require('rollup');
-const transpileScss = require('./src/js/transpile-scss');
+import transpileScss from './src/js/transpile-scss';
+import rollupJs from './src/js/rollup-js';
 
 const buildStyle = async () => writeFile(
-  resolve(__dirname, 'dist', 'style.css'),
+  resolve('.', 'dist', 'style.css'),
 
-  await transpileScss(resolve(__dirname, 'src', 'assets', 'style.scss')),
+  await transpileScss(resolve('.', 'src', 'assets', 'style.scss')),
 );
 
-const bundleScripts = async () => {
-  const input = await rollup({
-    input: './src/assets/scripts.js',
+const bundleScripts = async () => Promise.all([
+  writeFile(
+    resolve('.', 'dist', 'scripts.js'),
 
-    plugins: [
-      commonjs(),
+    await rollupJs({
+      input: {
+        input: './src/assets/scripts.js',
 
-      nodeResolve(),
-    ],
-  });
+        plugins: [
+          commonjs(),
 
-  const { output } = await input.generate({
-    format: 'iife',
+          nodeResolve(),
+        ],
+      },
 
-    name: 'pkgBrowserGamepadRuntime',
-  });
+      output: {
+        format: 'iife',
 
-  await writeFile(
-    resolve(__dirname, 'dist', 'scripts.js'),
+        name: 'pkgBrowserGamepadRuntime',
+      },
+    }),
+  ),
 
-    output[0].code,
-  );
-};
+  writeFile(
+    resolve('.', 'dist', 'launch-browser.cjs'),
+
+    await rollupJs({
+      input: {
+        input: './src/js/launch-browser.js',
+
+        plugins: [
+          commonjs(),
+        ],
+
+        external: ['puppeteer'],
+      },
+
+      output: {
+        exports: 'default',
+        name: 'launchBrowser',
+        format: 'cjs',
+      },
+    }),
+  ),
+
+  writeFile(
+    resolve('.', 'dist', 'index.cjs'),
+
+    await rollupJs({
+      input: {
+        input: './src/index.js',
+
+        plugins: [
+          commonjs(),
+        ],
+
+        external: [
+          'argv',
+
+          'globby',
+
+          'pkg',
+
+          'path',
+
+          'fs/promises',
+        ],
+      },
+
+      output: {
+        // exports: 'default',
+        name: 'launchBrowser',
+        format: 'cjs',
+      },
+    }),
+  ),
+]);
 
 buildStyle();
 

@@ -8,4 +8,4 @@ const getHandledElementPropValue = async (handledElement, propName) => {
   return handledProp.jsonValue();
 };
 
-module.exports = getHandledElementPropValue;
+export default getHandledElementPropValue;

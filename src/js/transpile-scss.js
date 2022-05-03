@@ -1,7 +1,7 @@
-const sass = require('node-sass');
+import { render } from 'node-sass';
 
 const transpileScss = (file) => new Promise((resolve, reject) => {
-  sass.render({
+  render({
     file,
 
     outputStyle: 'nested',
@@ -18,4 +18,4 @@ const transpileScss = (file) => new Promise((resolve, reject) => {
   });
 });
 
-module.exports = transpileScss;
+export default transpileScss;

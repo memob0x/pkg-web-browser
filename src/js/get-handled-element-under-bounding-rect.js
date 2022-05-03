@@ -1,10 +1,10 @@
-const getBoundingRectCenterPoint = require('./get-bounding-rect-center-point');
-const getPointsDistance = require('./get-points-distance');
-const getBoundingRectsOverlappingArea = require('./get-bounding-rects-overlapping-area');
-const convertBoundingBoxToBoundingRect = require('./convert-bounding-box-to-bounding-rect');
-const getHandledElementBoundingBox = require('./get-handled-element-bounding-box');
-const log = require('./log');
-const getHandledElementPropValue = require('./get-handled-element-prop-value');
+const getBoundingRectCenterPoint = require('./get-bounding-rect-center-point').default;
+const getPointsDistance = require('./get-points-distance').default;
+const getBoundingRectsOverlappingArea = require('./get-bounding-rects-overlapping-area').default;
+const convertBoundingBoxToBoundingRect = require('./convert-bounding-box-to-bounding-rect').default;
+const getHandledElementBoundingBox = require('./get-handled-element-bounding-box').default;
+const log = require('./log').default;
+const getHandledElementPropValue = require('./get-handled-element-prop-value').default;
 
 const getHandledElementUnderBoundingRect = async (focusableElements, centerPoint, boundingRect) => {
   const { element: closestElement } = await focusableElements.reduce(

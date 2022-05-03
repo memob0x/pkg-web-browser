@@ -1,4 +1,4 @@
-const log = require('./log');
+import log from './log';
 
 const reload = async (page) => {
   try {
@@ -66,4 +66,4 @@ const triggerPageNavigation = async (page, direction) => {
   return null;
 };
 
-module.exports = triggerPageNavigation;
+export default triggerPageNavigation;

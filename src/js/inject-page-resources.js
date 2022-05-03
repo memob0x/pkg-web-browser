@@ -1,18 +1,18 @@
-const throttle = require('./throttle');
-const triggerPageKeyPress = require('./trigger-page-keypress');
-const getHandledElementUnderBoundingRect = require('./get-handled-element-focusable-under-bounding-rect');
-const hasButtonPressed = require('./has-button-pressed');
-const log = require('./log');
-const triggerPageNavigation = require('./trigger-page-navigation');
-const getHandledElementPropValue = require('./get-handled-element-prop-value');
-const queryPage = require('./query-page');
-const triggerHandledElementMethod = require('./trigger-handled-element-method');
-const getBoundingRectCenterPoint = require('./get-bounding-rect-center-point');
-const triggerPageClose = require('./trigger-page-close');
+import throttle from './throttle';
+import triggerPageKeyPress from './trigger-page-keypress';
+import getHandledElementUnderBoundingRect from './get-handled-element-focusable-under-bounding-rect';
+import hasButtonPressed from './has-button-pressed';
+import log from './log';
+import triggerPageNavigation from './trigger-page-navigation';
+import getHandledElementPropValue from './get-handled-element-prop-value';
+import queryPage from './query-page';
+import triggerHandledElementMethod from './trigger-handled-element-method';
+import getBoundingRectCenterPoint from './get-bounding-rect-center-point';
+import triggerPageClose from './trigger-page-close';
+import exposePageFunction from './expose-page-function';
+import evaluatePageCode from './evaluate-page-code';
 
-const { INT_MS_THROTTLE_DELAY_LONG, INT_MS_THROTTLE_DELAY_SHORT } = require('./constants');
-const exposePageFunction = require('./expose-page-function');
-const evaluatePageCode = require('./evaluate-page-code');
+import { INT_MS_THROTTLE_DELAY_LONG, INT_MS_THROTTLE_DELAY_SHORT } from './constants';
 
 const injectPageResources = async (page, options) => {
   const {
@@ -256,4 +256,4 @@ const injectPageResources = async (page, options) => {
   `);
 };
 
-module.exports = injectPageResources;
+export default injectPageResources;

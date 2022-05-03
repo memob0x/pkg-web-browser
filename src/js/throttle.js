@@ -14,4 +14,4 @@ const throttle = (fn, ms) => {
   };
 };
 
-module.exports = throttle;
+export default throttle;

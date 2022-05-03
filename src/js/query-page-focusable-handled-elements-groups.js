@@ -1,4 +1,4 @@
-const queryPage = require('./query-page');
+import queryPage from './query-page';
 
 const focusableClickableTags = [
   'a',
@@ -43,4 +43,4 @@ const queryPageFocusableHandledElementsGroups = async (page) => {
   ]);
 };
 
-module.exports = queryPageFocusableHandledElementsGroups;
+export default queryPageFocusableHandledElementsGroups;

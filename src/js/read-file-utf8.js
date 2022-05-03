@@ -1,4 +1,4 @@
-const { readFile } = require('fs/promises');
+import { readFile } from 'fs/promises';
 
 const readFileUtf8 = async (x) => {
   try {
@@ -8,4 +8,4 @@ const readFileUtf8 = async (x) => {
   }
 };
 
-module.exports = readFileUtf8;
+export default readFileUtf8;

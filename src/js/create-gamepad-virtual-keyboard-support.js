@@ -1,9 +1,9 @@
-const { default: Keyboard } = require('simple-keyboard');
-const { default: KeyNavigator } = require('simple-keyboard-key-navigation');
-const hasButtonPressed = require('./has-button-pressed');
-const throttle = require('./throttle');
+import Keyboard from 'simple-keyboard';
+import KeyNavigator from 'simple-keyboard-key-navigation';
+import hasButtonPressed from './has-button-pressed';
+import throttle from './throttle';
 
-const { INT_MS_THROTTLE_DELAY_LONG } = require('./constants');
+import { INT_MS_THROTTLE_DELAY_LONG } from './constants';
 
 // {bksp} {tab} {lock} {shift}...
 const keyboardLayout = [
@@ -257,4 +257,4 @@ const createGamepadVirtualKeyboardSupport = (client) => {
   };
 };
 
-module.exports = createGamepadVirtualKeyboardSupport;
+export default createGamepadVirtualKeyboardSupport;

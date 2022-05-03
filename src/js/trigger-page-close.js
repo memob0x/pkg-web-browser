@@ -1,5 +1,5 @@
-const getPageTitleExcerpt = require('./get-page-title-excerpt');
-const log = require('./log');
+import getPageTitleExcerpt from './get-page-title-excerpt';
+import log from './log';
 
 const triggerPageClose = async (page) => {
   const title = await getPageTitleExcerpt(page);
@@ -15,4 +15,4 @@ const triggerPageClose = async (page) => {
   }
 };
 
-module.exports = triggerPageClose;
+export default triggerPageClose;

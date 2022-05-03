@@ -1,5 +1,5 @@
-const { STRING_INJECTED_FLAG_NAME } = require('./constants');
-const evaluatePageCode = require('./evaluate-page-code');
+import { STRING_INJECTED_FLAG_NAME } from './constants';
+import evaluatePageCode from './evaluate-page-code';
 
 const hasPageInjectedResources = async (page) => {
   const value = await evaluatePageCode(page, `window.${STRING_INJECTED_FLAG_NAME}`);
@@ -7,4 +7,4 @@ const hasPageInjectedResources = async (page) => {
   return !!value;
 };
 
-module.exports = hasPageInjectedResources;
+export default hasPageInjectedResources;

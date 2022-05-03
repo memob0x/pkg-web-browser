@@ -34,4 +34,4 @@ const identifyPages = async (browser) => {
   );
 };
 
-module.exports = identifyPages;
+export default identifyPages;

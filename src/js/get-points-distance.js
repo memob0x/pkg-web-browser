@@ -6,4 +6,4 @@ const getPointsDistance = (pointA, pointB) => {
   return Math.sqrt((xb - xa) ** 2 + (yb - ya) ** 2);
 };
 
-module.exports = getPointsDistance;
+export default getPointsDistance;

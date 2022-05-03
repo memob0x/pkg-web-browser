@@ -1,8 +1,8 @@
-const getPageTitleExcerpt = require('./get-page-title-excerpt');
-const hasPageInjectedResources = require('./has-page-injected-resources');
-const injectPageResources = require('./inject-page-resources');
-const log = require('./log');
-const setPageInjectionFlag = require('./set-page-injection-flag');
+import getPageTitleExcerpt from './get-page-title-excerpt';
+import hasPageInjectedResources from './has-page-injected-resources';
+import injectPageResources from './inject-page-resources';
+import log from './log';
+import setPageInjectionFlag from './set-page-injection-flag';
 
 const injectPageResourcesOnce = async (page, options) => {
   try {
@@ -24,4 +24,4 @@ const injectPageResourcesOnce = async (page, options) => {
   }
 };
 
-module.exports = injectPageResourcesOnce;
+export default injectPageResourcesOnce;

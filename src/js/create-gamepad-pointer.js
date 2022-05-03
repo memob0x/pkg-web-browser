@@ -1,6 +1,7 @@
-const { INT_MS_THROTTLE_DELAY_LONG } = require('./constants');
-const hasButtonPressed = require('./has-button-pressed');
-const throttle = require('./throttle');
+import hasButtonPressed from './has-button-pressed';
+import throttle from './throttle';
+
+import { INT_MS_THROTTLE_DELAY_LONG } from './constants';
 
 const createGamepadPointer = (client) => {
   const {
@@ -127,4 +128,4 @@ const createGamepadPointer = (client) => {
   };
 };
 
-module.exports = createGamepadPointer;
+export default createGamepadPointer;
