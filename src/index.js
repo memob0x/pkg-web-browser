@@ -90,7 +90,7 @@ const run = async () => {
   const runtimeFilePrefix = 'runtime-';
   const runtimeFileExtension = '.js';
 
-  const runtimeFilename = `${runtimeFilePrefix}${performance.now()}${Math.random()}${runtimeFileExtension}`;
+  const runtimeFilename = `${runtimeFilePrefix}${Date.now()}${Math.random()}${runtimeFileExtension}`;
 
   const runtimeFile = resolve('.', runtimeFilename);
 
