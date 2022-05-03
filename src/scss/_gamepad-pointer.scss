@@ -1,11 +1,15 @@
+$size: 210px;
+
+$size_half: $size / 2;
+
 .gamepad-pointer {
   position: fixed;
   
-  top: var(--gamepad-pointer-top);
-  left: var(--gamepad-pointer-left);
+  top: calc(var(--gamepad-pointer-top) - #{$size_half});
+  left: calc(var(--gamepad-pointer-left) - #{$size_half});
 
   z-index: 99998;
-  width: 210px;
+  width: $size;
 
   transform: scale(0);
   transition: transform 0.8s ease;

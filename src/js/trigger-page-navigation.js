@@ -48,7 +48,7 @@ const goBack = async (page) => {
   }
 };
 
-const triggerPageNavigation = async (page, direction) => {
+const triggerPageNavigation = (page, direction) => {
   if (!direction) {
     return reload(page);
   }
@@ -63,7 +63,7 @@ const triggerPageNavigation = async (page, direction) => {
 
   log('error', `unrecognized direction ${direction}`);
 
-  return null;
+  return Promise.resolve(null);
 };
 
 export default triggerPageNavigation;

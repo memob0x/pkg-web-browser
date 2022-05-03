@@ -5,6 +5,10 @@ const createGamepadPointer = (client) => {
     removeEventListener,
 
     document,
+
+    innerWidth,
+
+    innerHeight,
   } = client || {};
 
   const element = document.createElement('div');
@@ -67,6 +71,18 @@ const createGamepadPointer = (client) => {
     top += y * 50;
 
     const { documentElement } = document;
+
+    const minBoundX = 0;
+    const minBoundY = 0;
+
+    const maxBoundX = innerWidth;
+    const maxBoundY = innerHeight;
+
+    left = left < minBoundX ? minBoundX : left;
+    top = top < minBoundY ? minBoundY : top;
+
+    left = left > maxBoundX ? maxBoundX : left;
+    top = top > maxBoundY ? maxBoundY : top;
 
     const { style } = documentElement;
 

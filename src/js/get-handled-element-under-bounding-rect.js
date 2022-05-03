@@ -38,6 +38,12 @@ const getHandledElementUnderBoundingRect = async (focusableElements, centerPoint
       const isElementCloser = elementDistance < formerDistance;
 
       if (isElementMoreOverlapped && isElementCloser) {
+        log('log', 'current element overlapping area:', elementOverlappingArea);
+        log('log', 'current element distance:', elementDistance);
+
+        log('log', 'former element overlapping area:', formerOverlappingArea);
+        log('log', 'former element distance:', formerDistance);
+
         return {
           overlappingArea: elementOverlappingArea,
 
@@ -51,7 +57,7 @@ const getHandledElementUnderBoundingRect = async (focusableElements, centerPoint
     },
 
     Promise.resolve({
-      overlappingArea: -Infinity,
+      overlappingArea: 0,
 
       distance: Infinity,
     }),

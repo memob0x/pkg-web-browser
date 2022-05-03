@@ -28,7 +28,7 @@ const getHandledElementFocusableUnderBoundingRect = async (page, boundingRect) =
     );
 
     if (closestElement) {
-      log('log', name);
+      log('log', `most under bounding client rect focusable element is in ${name} context`);
 
       return closestElement;
     }
