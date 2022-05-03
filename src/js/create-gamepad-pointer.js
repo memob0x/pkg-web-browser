@@ -1,8 +1,3 @@
-import hasButtonPressed from './has-button-pressed';
-import throttle from './throttle';
-
-import { INT_MS_THROTTLE_DELAY_LONG } from './constants';
-
 const createGamepadPointer = (client) => {
   const {
     addEventListener,
@@ -59,29 +54,17 @@ const createGamepadPointer = (client) => {
 
   const isActive = () => classList.contains('gamepad-pointer--active');
 
-  const gamepadButtonpressAnalogHandler = throttle(({ detail }) => {
-    if (!hasButtonPressed(detail, 'analogleft') && !hasButtonPressed(detail, 'analogright')) {
-      return;
-    }
-
-    if (isActive()) {
-      deactivate();
-
-      return;
-    }
-
-    activate();
-  }, INT_MS_THROTTLE_DELAY_LONG);
-
   const gamepadAnalogMoveHandler = ({ detail }) => {
-    if (!isActive()) {
+    const { name, analog } = detail;
+
+    if (name !== 'right') {
       return;
     }
 
-    const { analog } = detail;
+    const [x, y] = analog || [];
 
-    left += analog[0] * 50;
-    top += analog[1] * 50;
+    left += x * 50;
+    top += y * 50;
 
     const { documentElement } = document;
 
@@ -93,12 +76,12 @@ const createGamepadPointer = (client) => {
     activate();
   };
 
-  addEventListener('gamepadbuttonpress', gamepadButtonpressAnalogHandler);
+  addEventListener('gamepadbuttonpress', deactivate);
 
   addEventListener('gamepadanalogmove', gamepadAnalogMoveHandler);
 
   const destroy = () => {
-    removeEventListener('gamepadbuttonpress', gamepadButtonpressAnalogHandler);
+    removeEventListener('gamepadbuttonpress', deactivate);
 
     removeEventListener('gamepadanalogmove', gamepadAnalogMoveHandler);
   };

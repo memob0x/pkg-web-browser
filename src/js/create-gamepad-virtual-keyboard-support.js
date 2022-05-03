@@ -3,7 +3,7 @@ import KeyNavigator from 'simple-keyboard-key-navigation';
 import hasButtonPressed from './has-button-pressed';
 import throttle from './throttle';
 
-import { INT_MS_THROTTLE_DELAY_LONG } from './constants';
+import { INT_MS_THROTTLE_DELAY } from './constants';
 
 // {bksp} {tab} {lock} {shift}...
 const keyboardLayout = [
@@ -179,18 +179,9 @@ const createGamepadVirtualKeyboardSupport = (client) => {
     deactivate();
   };
 
-  const buttonPressHandler = throttle(({ detail }) => {
-    const isUp = hasButtonPressed(detail, 'dpadup');
-    const isDown = hasButtonPressed(detail, 'dpaddown');
-    const isRight = hasButtonPressed(detail, 'dpadright');
-    const isLeft = hasButtonPressed(detail, 'dpadleft');
-
-    const isA = hasButtonPressed(detail, 'a');
-
-    const isButtonSupported = isUp || isDown || isRight || isLeft || isA;
-
-    if (!isButtonSupported || !isActive() || !thirdPartyKeyboard) {
-      return;
+  const getKeyboardController = () => {
+    if (!thirdPartyKeyboard) {
+      return null;
     }
 
     const { modules } = thirdPartyKeyboard;
@@ -198,31 +189,59 @@ const createGamepadVirtualKeyboardSupport = (client) => {
     const { keyNavigation: KeyNavigatorModule } = modules || {};
 
     if (!KeyNavigatorModule) {
+      return null;
+    }
+
+    return KeyNavigatorModule;
+  };
+
+  const buttonPressHandler = throttle(({ detail }) => {
+    const isA = hasButtonPressed(detail, 'a');
+
+    const ctrl = getKeyboardController();
+
+    if (!isA || !ctrl || !isActive()) {
+      deactivate();
+
       return;
     }
 
-    if (isUp) {
-      KeyNavigatorModule.up();
+    ctrl.press();
+  }, INT_MS_THROTTLE_DELAY);
+
+  const analogMoveHandler = throttle(({ detail }) => {
+    const ctrl = getKeyboardController();
+
+    const { analog, name } = detail || {};
+
+    if (name !== 'left' || !ctrl || !isActive()) {
+      return;
     }
 
-    if (isDown) {
-      KeyNavigatorModule.down();
+    const [x, y] = analog || [];
+
+    const threshold = 0.5;
+
+    if (y < threshold * -1) {
+      ctrl.up();
     }
 
-    if (isRight) {
-      KeyNavigatorModule.right();
+    if (y > threshold) {
+      ctrl.down();
     }
 
-    if (isLeft) {
-      KeyNavigatorModule.left();
+    if (x < threshold * -1) {
+      ctrl.left();
     }
 
-    if (isA) {
-      KeyNavigatorModule.press();
+    if (x > threshold) {
+      ctrl.right();
     }
-  }, INT_MS_THROTTLE_DELAY_LONG);
+  }, INT_MS_THROTTLE_DELAY);
 
   addEventListener('gamepadbuttonpress', buttonPressHandler);
+
+  addEventListener('gamepadanalogmove', analogMoveHandler);
 
   addEventListener('focusin', update);
 
@@ -230,6 +249,8 @@ const createGamepadVirtualKeyboardSupport = (client) => {
 
   const destroy = () => {
     removeEventListener('gamepadbuttonpress', buttonPressHandler);
+
+    removeEventListener('gamepadanalogmove', analogMoveHandler);
 
     removeEventListener('focusin', update);
 

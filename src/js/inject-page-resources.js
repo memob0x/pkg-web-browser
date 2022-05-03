@@ -7,12 +7,11 @@ import triggerPageNavigation from './trigger-page-navigation';
 import getHandledElementPropValue from './get-handled-element-prop-value';
 import queryPage from './query-page';
 import triggerHandledElementMethod from './trigger-handled-element-method';
-import getBoundingRectCenterPoint from './get-bounding-rect-center-point';
 import triggerPageClose from './trigger-page-close';
 import exposePageFunction from './expose-page-function';
 import evaluatePageCode from './evaluate-page-code';
 
-import { INT_MS_THROTTLE_DELAY_LONG, INT_MS_THROTTLE_DELAY_SHORT } from './constants';
+import { INT_MS_THROTTLE_DELAY } from './constants';
 
 const injectPageResources = async (page, options) => {
   const {
@@ -31,18 +30,14 @@ const injectPageResources = async (page, options) => {
 
   log('log', 'files injection: ok');
 
-  await exposePageFunction(page, 'gamepadButtonPressHandlerThrottleLong', throttle(async (detail, support) => {
+  await exposePageFunction(page, 'gamepadButtonPressHandler', throttle(async (detail, support) => {
+    log('log', 'gamepadButtonPressHandler');
+
     const { gamepadPointer, gamepadVirtualKeyboard } = support || {};
 
     const { activeDeferred: isActiveKeyboard } = gamepadVirtualKeyboard || {};
 
-    if (isActiveKeyboard) {
-      return;
-    }
-
     const { activeDeferred: isActivePointer, boundingRect } = gamepadPointer || {};
-
-    const [pointerX, pointerY] = getBoundingRectCenterPoint(boundingRect);
 
     const elementPointer = await getHandledElementUnderBoundingRect(page, boundingRect);
     const [elementActive] = await queryPage(page, '*:focus');
@@ -51,9 +46,6 @@ const injectPageResources = async (page, options) => {
     elementClickable = elementClickable || elementPointer;
 
     const hasButtonPressedA = hasButtonPressed(detail, 'a');
-    const hasButtonPressedAnalogLeft = hasButtonPressed(detail, 'analogleft');
-    const hasButtonPressedAnalogRight = hasButtonPressed(detail, 'analogright');
-    const hasButtonPressedAnalog = hasButtonPressedAnalogLeft || hasButtonPressedAnalogRight;
     const hasButtonPressedL1 = hasButtonPressed(detail, 'l1');
     const hasButtonPressedL2 = hasButtonPressed(detail, 'l2');
     const hasButtonPressedR1 = hasButtonPressed(detail, 'r1');
@@ -66,60 +58,32 @@ const injectPageResources = async (page, options) => {
     const isElementClickable = !!elementClickableTag;
     const isElementClickableIframe = isElementClickable && elementClickableTag === 'IFRAME';
 
-    log('log', '---------------------------------------------------------------');
-
-    log('log', 'button press, clickable element tagName:', elementClickableTag);
-
     if (hasButtonPressedStart && hasButtonPressedSelect) {
       await triggerPageClose(page);
-
-      log('log', '---------------------------------------------------------------');
 
       return;
     }
 
-    if (isActivePointer) {
-      log('log', `mouse moved to ${pointerX} ${pointerY}`);
-
-      await page.mouse.move(pointerX, pointerY);
-    }
-
-    if (hasButtonPressedA && isElementClickableIframe) {
+    if (!isActiveKeyboard && hasButtonPressedA && isElementClickableIframe) {
       log('log', `button press: A, iframe navigation ${elementClickableTag}`);
 
       await page.goto(await getHandledElementPropValue(elementClickable, 'src'));
 
-      log('log', '---------------------------------------------------------------');
-
       return;
     }
 
-    if (hasButtonPressedA && isElementClickable && !isActivePointer) {
+    if (!isActiveKeyboard && !isActivePointer && hasButtonPressedA && isElementClickable) {
       log('log', `button press: A, selection (enter key) on ${elementClickableTag}`);
 
       await triggerPageKeyPress(page, 'Enter');
 
-      log('log', '---------------------------------------------------------------');
-
       return;
     }
 
-    if (hasButtonPressedA && isElementClickable && isActivePointer) {
+    if (!isActiveKeyboard && isActivePointer && hasButtonPressedA && isElementClickable) {
       log('log', `button press A, click ${elementClickableTag}`);
 
-      await triggerHandledElementMethod(elementClickable, 'click');
-
-      log('log', '---------------------------------------------------------------');
-
-      return;
-    }
-
-    if (hasButtonPressedAnalog && isActivePointer && elementPointer) {
-      log('log', `button press Analog, focus ${await getHandledElementPropValue(elementPointer, 'tagName')}`);
-
-      await triggerHandledElementMethod(elementPointer, 'focus');
-
-      log('log', '---------------------------------------------------------------');
+      await triggerHandledElementMethod(elementClickable, 'focus');
 
       return;
     }
@@ -129,8 +93,6 @@ const injectPageResources = async (page, options) => {
 
       await triggerPageNavigation(page, 0, true);
 
-      log('log', '---------------------------------------------------------------');
-
       return;
     }
 
@@ -138,8 +100,6 @@ const injectPageResources = async (page, options) => {
       log('log', 'button press l1 + l2, history: go back');
 
       await triggerPageNavigation(page, -1, true);
-
-      log('log', '---------------------------------------------------------------');
 
       return;
     }
@@ -149,8 +109,6 @@ const injectPageResources = async (page, options) => {
 
       await triggerPageNavigation(page, 1, true);
 
-      log('log', '---------------------------------------------------------------');
-
       return;
     }
 
@@ -158,8 +116,6 @@ const injectPageResources = async (page, options) => {
       log('log', 'button press r1, tab navigation: go right');
 
       await triggerPageKeyPress(page, 'Tab');
-
-      log('log', '---------------------------------------------------------------');
 
       return;
     }
@@ -173,20 +129,6 @@ const injectPageResources = async (page, options) => {
         triggerPageKeyPress(page, 'Tab'),
       ]);
 
-      log('log', '---------------------------------------------------------------');
-
-      return;
-    }
-
-    log('log', 'button press not handled by gamepadButtonPressHandlerThrottleLong');
-  }, INT_MS_THROTTLE_DELAY_LONG));
-
-  await exposePageFunction(page, 'gamepadButtonPressHandlerThrottleShort', throttle(async (detail, support) => {
-    const { gamepadVirtualKeyboard } = support || {};
-
-    const { activeDeferred: isActiveKeyboard } = gamepadVirtualKeyboard || {};
-
-    if (isActiveKeyboard) {
       return;
     }
 
@@ -200,8 +142,6 @@ const injectPageResources = async (page, options) => {
 
       await triggerPageKeyPress(page, 'ArrowUp');
 
-      log('log', '---------------------------------------------------------------');
-
       return;
     }
 
@@ -210,16 +150,13 @@ const injectPageResources = async (page, options) => {
 
       await triggerPageKeyPress(page, 'ArrowRight');
 
-      log('log', '---------------------------------------------------------------');
-
       return;
     }
+
     if (hasButtonPressedDPadDown) {
       log('log', 'button press dpaddown, arrow down');
 
       await triggerPageKeyPress(page, 'ArrowDown');
-
-      log('log', '---------------------------------------------------------------');
 
       return;
     }
@@ -229,13 +166,11 @@ const injectPageResources = async (page, options) => {
 
       await triggerPageKeyPress(page, 'ArrowLeft');
 
-      log('log', '---------------------------------------------------------------');
-
       return;
     }
 
-    log('log', 'button press not handled by gamepadButtonPressHandlerThrottleShort');
-  }, INT_MS_THROTTLE_DELAY_SHORT));
+    log('log', 'button press not handled by gamepadButtonPressHandler');
+  }, INT_MS_THROTTLE_DELAY));
 
   await exposePageFunction(page, 'virtualKeyboardKeypressHandler', async (detail) => {
     await triggerPageKeyPress(page, detail);
@@ -243,11 +178,7 @@ const injectPageResources = async (page, options) => {
 
   await evaluatePageCode(page, `
     window.addEventListener('gamepadbuttonpress', ({ detail }) => {
-      window.gamepadButtonPressHandlerThrottleLong(detail, window.pkgBrowserGamepadRuntime);
-    });
-    
-    window.addEventListener('gamepadbuttonpress', ({ detail }) => {
-      window.gamepadButtonPressHandlerThrottleShort(detail, window.pkgBrowserGamepadRuntime);
+      window.gamepadButtonPressHandler(detail, window.pkgBrowserGamepadRuntime);
     });
 
     window.addEventListener('virtualkeyboardkeypress', ({ detail }) => {
