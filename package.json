@@ -3,14 +3,14 @@
   "version": "0.0.1",
   "type": "module",
   "description": "Control any website navigation with a gamepad",
-  "main": "dist/index.cjs",
+  "main": "dist/make.cjs",
   "bin": {
-    "pkg-website-gamepad": "dist/index.cjs"
+    "pkg-website-gamepad": "dist/make.cjs"
   },
   "scripts": {
     "build": "node --experimental-specifier-resolution=node ./build.js",
-    "serve": "node ./src/js/index.js",
-    "pkg": "npm run build && node ./dist/index.cjs",
+    "pkg-src": "node --experimental-specifier-resolution=node ./src/js/make.js",
+    "pkg-dist": "npm run build && node ./dist/make.cjs",
     "test:unit": "./node_modules/.bin/mocha --experimental-specifier-resolution=node ./test/unit/*.spec.*",
     "test": "npm run test:unit",
     "lint": "./node_modules/.bin/eslint --ext .js . --fix",

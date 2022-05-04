@@ -92,7 +92,7 @@ const [
   output = '',
 ] = targets || [];
 
-const run = async () => {
+(async () => {
   const runtimeFilePrefix = 'runtime-';
   const runtimeFileExtension = '.js';
 
@@ -105,7 +105,7 @@ const run = async () => {
 
     rollupJs({
       input: {
-        input: resolve(PATH_SRC, 'js', 'create-browser-gamepad-support.js'),
+        input: resolve(PATH_SRC, 'js', 'browser.js'),
 
         plugins: [
           commonjs(),
@@ -187,6 +187,4 @@ const run = async () => {
   }
 
   await unlink(`./${runtimeFilename}`);
-};
-
-run();
+})();

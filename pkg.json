@@ -1,7 +1,5 @@
 {
   "assets": [
-    "dist/style.css",
-    "dist/scripts.js",
     "runtime-*.js"
   ]
 }

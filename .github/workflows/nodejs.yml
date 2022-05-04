@@ -18,6 +18,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm test
-      - run: npm run pkg
+      - run: npm run pkg-dist
         env:
           CI: true

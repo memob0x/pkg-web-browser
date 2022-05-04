@@ -16,11 +16,11 @@ try {
 }
 
 writeFile(
-  resolve(PATH_DIST, 'index.cjs'),
+  resolve(PATH_DIST, 'make.cjs'),
 
   await rollupJs({
     input: {
-      input: resolve(PATH_SRC, 'js', 'create-node-package.js'),
+      input: resolve(PATH_SRC, 'js', 'make.js'),
 
       plugins: [
         commonjs(),
