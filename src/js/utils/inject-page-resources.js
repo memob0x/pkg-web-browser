@@ -11,7 +11,7 @@ import triggerPageClose from './trigger-page-close';
 import exposePageFunction from './expose-page-function';
 import evaluatePageCode from './evaluate-page-code';
 
-import { INT_MS_THROTTLE_DELAY } from './constants';
+import { INT_MS_THROTTLE_DELAY } from '../constants';
 
 const injectPageResources = async (page, options) => {
   const {
@@ -178,11 +178,11 @@ const injectPageResources = async (page, options) => {
 
   await evaluatePageCode(page, `
     window.addEventListener('gamepadbuttonpress', ({ detail }) => {
-      window.gamepadButtonPressHandler(detail, window.pkgBrowserGamepadRuntime);
+      window.gamepadButtonPressHandler(detail, window.browserGamepadSupport);
     });
 
     window.addEventListener('virtualkeyboardkeypress', ({ detail }) => {
-      window.virtualKeyboardKeypressHandler(detail, window.pkgBrowserGamepadRuntime);
+      window.virtualKeyboardKeypressHandler(detail, window.browserGamepadSupport);
     });
   `);
 };

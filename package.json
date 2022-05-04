@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "node --experimental-specifier-resolution=node ./build.js",
+    "serve": "node ./src/js/index.js",
     "pkg": "npm run build && node ./dist/index.cjs",
     "test:unit": "./node_modules/.bin/mocha --experimental-specifier-resolution=node ./test/unit/*.spec.*",
     "test": "npm run test:unit",

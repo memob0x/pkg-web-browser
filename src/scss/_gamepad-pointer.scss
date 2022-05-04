@@ -1,20 +1,17 @@
-$size: 210px;
-
-$size_half: $size / 2;
+@import './vars';
 
 .gamepad-pointer {
+  $size: $pointer-size / 2;
+
   position: fixed;
-  
-  top: calc(var(--gamepad-pointer-top) - #{$size_half});
-  left: calc(var(--gamepad-pointer-left) - #{$size_half});
 
-  z-index: 99998;
-  width: $size;
+  top: calc(var(--gamepad-pointer-top) - #{$size});
+  left: calc(var(--gamepad-pointer-left) - #{$size});
 
-  transform: scale(0);
-  transition: transform 0.8s ease;
+  z-index: $z-index-pointer;
+  width: $pointer-size;
 
-  background: rgba(0, 162, 255, 0.2);
+  background: rgba($color-highlight, 0.2);
   border-radius: 100%;
 
   &::after {
@@ -23,6 +20,9 @@ $size_half: $size / 2;
     display: block;
     padding-bottom: 100%;
   }
+
+  transform: scale(0);
+  transition: transform 0.8s ease;
 
   &--active {
     transform: scale(1);

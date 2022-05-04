@@ -6,8 +6,14 @@ import { writeFile, unlink } from 'fs/promises';
 
 import { resolve } from 'path';
 
-import log from './js/log';
-import readFileUtf8 from './js/read-file-utf8';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import log from './utils/log';
+import transpileScss from './utils/transpile-scss';
+
+import rollupJs from './utils/rollup-js';
+
+import { PATH_SRC } from '../../paths';
 
 const { option } = pkg;
 
@@ -94,37 +100,70 @@ const run = async () => {
 
   const runtimeFile = resolve('.', runtimeFilename);
 
-  // runtimeCssCodeToBeInjected
-  const [css, js] = await Promise.all([
-    readFileUtf8('./dist/style.css'),
+  const [cssMain, jsBrowserGamepadSupport, jsLaunchBrowser] = await Promise.all([
+    transpileScss(resolve(PATH_SRC, 'scss', 'main.scss')),
 
-    // runtimeJsCodeToBeInjected
-    readFileUtf8('./dist/scripts.js'),
+    rollupJs({
+      input: {
+        input: resolve(PATH_SRC, 'js', 'create-browser-gamepad-support.js'),
+
+        plugins: [
+          commonjs(),
+
+          nodeResolve(),
+        ],
+      },
+
+      output: {
+        format: 'iife',
+
+        name: 'browserGamepadSupport',
+      },
+    }),
+
+    rollupJs({
+      input: {
+        input: resolve(PATH_SRC, 'js', 'utils', 'launch-browser.js'),
+
+        plugins: [
+          commonjs(),
+        ],
+
+        external: ['puppeteer'],
+      },
+
+      output: {
+        exports: 'default',
+        name: 'launchBrowser',
+        format: 'cjs',
+      },
+    }),
   ]);
+
+  const launchBrowserOptions = {
+    executablePath,
+
+    userDataDir,
+
+    width,
+
+    height,
+
+    kiosk,
+
+    focus,
+
+    css: cssMain,
+
+    js: jsBrowserGamepadSupport,
+
+    loopIntervalTime,
+  };
 
   await writeFile(
     runtimeFile,
 
-    `require('./dist/launch-browser.cjs')(${JSON.stringify(url)}, ${JSON.stringify({
-      executablePath,
-
-      userDataDir,
-
-      width,
-
-      height,
-
-      kiosk,
-
-      focus,
-
-      css,
-
-      js,
-
-      loopIntervalTime,
-    })}
-    );`,
+    `${jsLaunchBrowser}\n\nlaunchBrowser(${JSON.stringify(url)}, ${JSON.stringify(launchBrowserOptions)});`,
   );
 
   try {

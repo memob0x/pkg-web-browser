@@ -3,7 +3,7 @@ import KeyNavigator from 'simple-keyboard-key-navigation';
 import hasButtonPressed from './has-button-pressed';
 import throttle from './throttle';
 
-import { INT_MS_THROTTLE_DELAY } from './constants';
+import { INT_MS_THROTTLE_DELAY } from '../constants';
 
 // {bksp} {tab} {lock} {shift}...
 const keyboardLayout = [
@@ -69,6 +69,10 @@ const initializeThirdPartyKeyboard = (className, onKeyPress) => {
     return null;
   }
 };
+
+const DIGIT_ANALOG_THRESHOLD = 0.35;
+
+const DIGIT_ANALOG_THRESHOLD_NEGATIVE = DIGIT_ANALOG_THRESHOLD * -1;
 
 const createGamepadVirtualKeyboardSupport = (client) => {
   const {
@@ -220,21 +224,19 @@ const createGamepadVirtualKeyboardSupport = (client) => {
 
     const [x, y] = analog || [];
 
-    const threshold = 0.5;
-
-    if (y < threshold * -1) {
+    if (y < DIGIT_ANALOG_THRESHOLD_NEGATIVE) {
       ctrl.up();
     }
 
-    if (y > threshold) {
+    if (y > DIGIT_ANALOG_THRESHOLD) {
       ctrl.down();
     }
 
-    if (x < threshold * -1) {
+    if (x < DIGIT_ANALOG_THRESHOLD_NEGATIVE) {
       ctrl.left();
     }
 
-    if (x > threshold) {
+    if (x > DIGIT_ANALOG_THRESHOLD) {
       ctrl.right();
     }
   }, INT_MS_THROTTLE_DELAY);

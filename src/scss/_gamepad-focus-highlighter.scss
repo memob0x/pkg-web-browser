@@ -1,3 +1,6 @@
+@import './vars';
+@import './mixins';
+
 .gamepad-focus-highlighter {
   position: fixed;
 
@@ -10,22 +13,11 @@
 
   transform: translateX(calc(var(--gamepad-focus-highlighter-left, 0))) translateY(calc(var(--gamepad-focus-highlighter-top, 0)));
 
-  z-index: 99999;
-
-  box-shadow: 0 0 14px 1px rgba(0, 162, 255, 0.6);
+  z-index: $z-index-focus-highlighter;
 
   transition: transform .15s ease;
 
-  &::after {
-    content: "";
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    box-shadow: 0 0 14px 1px rgba(0, 162, 255, 0.6) inset;
-  }
+  @include highlight;
 
   &--full-screen {
     visibility: hidden;

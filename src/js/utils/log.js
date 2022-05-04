@@ -1,4 +1,4 @@
-import { BOOL_LOG_LEVEL } from './constants';
+import { BOOL_LOG_LEVEL } from '../constants';
 
 const log = (type, ...args) => {
   const isError = type === 'error';

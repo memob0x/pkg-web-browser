@@ -1,4 +1,4 @@
-import { STRING_INJECTED_FLAG_NAME } from './constants';
+import { STRING_INJECTED_FLAG_NAME } from '../constants';
 import evaluatePageCode from './evaluate-page-code';
 
 const hasPageInjectedResources = async (page) => {

@@ -1,8 +1,8 @@
 import roundDecimals from './round-decimals';
 
 const buttonNames = {
-  0: 'b',
-  1: 'a',
+  0: 'a',
+  1: 'b',
   2: 'y',
   3: 'x',
 
