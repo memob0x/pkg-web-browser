@@ -1,3 +1,5 @@
+import appendElementOnce from './append-element-once';
+
 const createGamepadPointer = (client) => {
   const {
     addEventListener,
@@ -35,14 +37,8 @@ const createGamepadPointer = (client) => {
   };
 
   const activate = () => {
-    const { body } = document;
-
-    if (!body) {
+    if (!appendElementOnce(document, element)) {
       return;
-    }
-
-    if (!body.contains(element)) {
-      body.append(element);
     }
 
     classList.add('gamepad-pointer--active');

@@ -2,25 +2,26 @@ import getPageTitleExcerpt from './get-page-title-excerpt';
 import hasPageInjectedResources from './has-page-injected-resources';
 import injectPageResources from './inject-page-resources';
 import log from './log';
-import setPageInjectionFlag from './set-page-injection-flag';
 
 const injectPageResourcesOnce = async (page, options) => {
+  const title = await getPageTitleExcerpt(page);
+
   try {
+    await page.setBypassCSP(true);
+
     const isInjected = await hasPageInjectedResources(page);
 
-    log('log', `page "${await getPageTitleExcerpt(page)}" injection:`, isInjected);
+    log('log', `page "${title}" injection:`, isInjected);
 
     if (!isInjected) {
-      await setPageInjectionFlag(page, true);
-
-      log('log', 'injecting');
+      log('log', `page "${title}" injecting`);
 
       await injectPageResources(page, options);
 
-      log('log', 'injected');
+      log('log', `page "${title}" injected`);
     }
   } catch (e) {
-    log('warning', 'injection failed, a new attempt will be done on next loop iteration');
+    log('warning', `page "${title}" injection failed`);
   }
 };
 

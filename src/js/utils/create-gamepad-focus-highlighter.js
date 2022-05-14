@@ -1,3 +1,5 @@
+import appendElementOnce from './append-element-once';
+
 const createGamepadFocusHighlighter = (client) => {
   const {
     document,
@@ -18,14 +20,8 @@ const createGamepadFocusHighlighter = (client) => {
   let hasBeenDestroyed = false;
 
   const update = () => {
-    const { body } = document;
-
-    if (!body) {
+    if (!appendElementOnce(document, element)) {
       return;
-    }
-
-    if (!body.contains(element)) {
-      body.append(element);
     }
 
     const { documentElement, activeElement } = document;
@@ -46,6 +42,8 @@ const createGamepadFocusHighlighter = (client) => {
     style.setProperty('--gamepad-focus-highlighter-left', `${activeElementLeft}px`);
     style.setProperty('--gamepad-focus-highlighter-width', `${activeElementWidth}px`);
     style.setProperty('--gamepad-focus-highlighter-height', `${activeElementHeight}px`);
+
+    const { body } = document;
 
     const {
       top: bodyTop,
@@ -90,7 +88,13 @@ const createGamepadFocusHighlighter = (client) => {
     removeEventListener('resize', update);
   };
 
-  return destroy;
+  return {
+    get element() {
+      return element;
+    },
+
+    destroy,
+  };
 };
 
 export default createGamepadFocusHighlighter;

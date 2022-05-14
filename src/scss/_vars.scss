@@ -1,8 +1,9 @@
 $color-highlight: #00a2ff;
 $pointer-size: 210px;
 
-$z-index-base: 99997;
+$z-index-max: 99999;
 
-$z-index-keyboard: $z-index-base;
-$z-index-pointer: $z-index-base + 1;
-$z-index-focus-highlighter: $z-index-base + 2;
+$z-index-focus-highlighter: $z-index-max;
+$z-index-options-panel: $z-index-max - 1;
+$z-index-keyboard: $z-index-max - 2;
+$z-index-pointer: $z-index-max - 3;

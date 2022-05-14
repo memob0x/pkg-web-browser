@@ -14,6 +14,7 @@ import transpileScss from './utils/transpile-scss';
 import rollupJs from './utils/rollup-js';
 
 import { PATH_SRC } from '../../paths';
+import { STRING_INJECTED_FLAG_NAME } from './constants';
 
 const { option } = pkg;
 
@@ -117,7 +118,7 @@ const [
       output: {
         format: 'iife',
 
-        name: 'browserGamepadSupport',
+        name: STRING_INJECTED_FLAG_NAME,
       },
     }),
 

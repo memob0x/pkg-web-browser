@@ -4,6 +4,7 @@ import hasButtonPressed from './has-button-pressed';
 import throttle from './throttle';
 
 import { INT_MS_THROTTLE_DELAY } from '../constants';
+import appendElementOnce from './append-element-once';
 
 // {bksp} {tab} {lock} {shift}...
 const keyboardLayout = [
@@ -74,6 +75,8 @@ const DIGIT_ANALOG_THRESHOLD = 0.35;
 
 const DIGIT_ANALOG_THRESHOLD_NEGATIVE = DIGIT_ANALOG_THRESHOLD * -1;
 
+const STRING_CSS_CLASS_NAME = 'gamepad-virtual-keyboard';
+
 const createGamepadVirtualKeyboardSupport = (client) => {
   const {
     document,
@@ -93,11 +96,11 @@ const createGamepadVirtualKeyboardSupport = (client) => {
 
   let activeDeferred = false;
 
-  classList.add('virtual-keyboard');
+  classList.add(STRING_CSS_CLASS_NAME);
 
   const holder = document.createElement('div');
 
-  holder.classList.add('virtual-keyboard__holder');
+  holder.classList.add(`${STRING_CSS_CLASS_NAME}__holder`);
 
   element.append(holder);
 
@@ -113,14 +116,14 @@ const createGamepadVirtualKeyboardSupport = (client) => {
     }
   };
 
-  const isActive = () => classList.contains('virtual-keyboard--active');
+  const isActive = () => classList.contains(`${STRING_CSS_CLASS_NAME}--active`);
 
   const deactivate = () => {
     if (!isActive()) {
       return;
     }
 
-    classList.remove('virtual-keyboard--active');
+    classList.remove(`${STRING_CSS_CLASS_NAME}--active`);
 
     setTimeout(() => {
       activeDeferred = false;
@@ -142,21 +145,11 @@ const createGamepadVirtualKeyboardSupport = (client) => {
   };
 
   const activate = () => {
-    if (isActive()) {
+    if (isActive() || !appendElementOnce(document, element)) {
       return;
     }
 
-    const { body } = document;
-
-    if (!body) {
-      return;
-    }
-
-    if (!body.contains(element)) {
-      body.append(element);
-    }
-
-    classList.add('virtual-keyboard--active');
+    classList.add(`${STRING_CSS_CLASS_NAME}--active`);
 
     setTimeout(() => {
       activeDeferred = true;
@@ -165,7 +158,7 @@ const createGamepadVirtualKeyboardSupport = (client) => {
     possiblyDestroyThirdPartyKeyboard();
 
     thirdPartyKeyboard = initializeThirdPartyKeyboard(
-      'virtual-keyboard__holder',
+      `${STRING_CSS_CLASS_NAME}__holder`,
 
       onKeyPress,
     );
