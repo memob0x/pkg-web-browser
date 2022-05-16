@@ -1,7 +1,7 @@
-const getExcerpt = (string, chars = 20) => {
-  const excerpt = string || '';
+const getExcerpt = (string, chars = 40) => {
+  let excerpt = string || '';
 
-  // TODO: remove all line breaks
+  excerpt = excerpt.replace(/\n/g, ' ');
 
   const { length } = excerpt;
 

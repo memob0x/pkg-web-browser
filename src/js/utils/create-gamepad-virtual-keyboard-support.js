@@ -47,7 +47,15 @@ const convertThirdPartyKeyboardKeyToStandard = (key) => {
   }
 };
 
-const isInputTypeWhichNeedKeyboard = (element) => element.matches('input') && inputTypesWhichNeedKeyboard.includes(element.getAttribute('type'));
+const isInputTypeWhichNeedKeyboard = (element) => {
+  if (!element.matches('input')) {
+    return false;
+  }
+
+  const { type } = element || {};
+
+  return inputTypesWhichNeedKeyboard.includes(type);
+};
 
 const isElKeyboardTrigger = (element) => element.matches('textarea') || isInputTypeWhichNeedKeyboard(element);
 
@@ -59,6 +67,10 @@ const initializeThirdPartyKeyboard = (className, onKeyPress) => {
       layout: {
         default: keyboardLayout,
       },
+
+      useMouseEvents: true,
+
+      preventMouseDownDefault: true,
 
       enableKeyNavigation: true,
 
@@ -237,6 +249,8 @@ const createGamepadVirtualKeyboardSupport = (client) => {
   addEventListener('gamepadbuttonpress', buttonPressHandler);
 
   addEventListener('gamepadanalogmove', analogMoveHandler);
+
+  // TODO: maybe support phisical keyboard too...
 
   addEventListener('focusin', update);
 
