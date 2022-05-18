@@ -11,7 +11,7 @@ import triggerPageClose from './trigger-page-close';
 import exposePageFunction from './expose-page-function';
 import evaluatePageCode from './evaluate-page-code';
 
-import { INT_MS_THROTTLE_DELAY } from '../constants';
+import { INT_MS_THROTTLE_DELAY, STRING_INJECTED_FLAG_NAME } from '../constants';
 
 const injectPageResources = async (page, options) => {
   const {
@@ -21,6 +21,9 @@ const injectPageResources = async (page, options) => {
   } = options || {};
 
   log('log', 'files injection: start');
+
+  // NOTE: since addScriptTag could take a while, the injection flag need to be set at this point
+  await evaluatePageCode(page, `window.${STRING_INJECTED_FLAG_NAME} = {};`);
 
   await Promise.all([
     page.addStyleTag({ content: css }),

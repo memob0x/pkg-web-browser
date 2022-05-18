@@ -12,6 +12,8 @@ const focusableClickableTags = [
   'textarea',
 
   '[role="button"]',
+
+  '[role="grid"]',
 ];
 
 const focusableSelectorAll = focusableClickableTags.map((x) => `${x}:not([tabindex="-1"], [disabled])`);

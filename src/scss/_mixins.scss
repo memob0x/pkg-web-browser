@@ -1,12 +1,16 @@
 @import './vars';
 
+$opacity: 0.8;
+
+$shadow: 0 0 14px 1px rgba($color-highlight, $opacity);
+
 @mixin highlight() { 
-  box-shadow: 0 0 14px 1px rgba($color-highlight, 0.6);
+  box-shadow: $shadow;
 
   &::after {
     content: "";
 
-    box-shadow: 0 0 14px 1px rgba($color-highlight, 0.6) inset;
+    box-shadow: $shadow inset;
 
     position: absolute;
     top: 0;

@@ -1,6 +1,19 @@
 @import '../../node_modules/simple-keyboard/build/css/index';
+@import "../../node_modules/bootstrap-icons/font/bootstrap-icons.scss";
 
 @import './mixins';
+
+$bootstrap-icons-font-src-path: "https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.2/font/fonts/";
+
+$bootstrap-icons-font-src: url($bootstrap-icons-font-src-path + "/bootstrap-icons.woff2?08efbba7c53d8c5413793eecb19b20bb") format("woff2"),
+  url($bootstrap-icons-font-src-path + "/bootstrap-icons.woff?08efbba7c53d8c5413793eecb19b20bb") format("woff");
+
+@font-face {
+  font-family: $bootstrap-icons-font;
+  src: $bootstrap-icons-font-src;
+}
+
+$keyboard-font-size: 1.7rem;
 
 .gamepad-virtual-keyboard {
   position: fixed;
@@ -11,7 +24,7 @@
   left: 0;
 
   color: #181818;
-  font-size: 1.7rem;
+  font-size: $keyboard-font-size;
   font-weight: 600;
 
   transform: translateY(100%);
@@ -23,5 +36,50 @@
 
   .hg-keyMarker {
     @include highlight;
+  }
+
+  .hg-button {
+
+    &,
+    [data-skbtn="@"] {
+      max-width: 6%;
+    }
+  }
+
+  .hg-button-space {
+    max-width: 50%;
+  }
+
+  %display-none {
+    display: none;
+  }
+
+  %icon-font {
+    font-family: $bootstrap-icons-font;
+    font-size: $keyboard-font-size - 0.5rem;
+  }
+
+  .hg-button-bksp {
+    span {
+      @extend %display-none;
+    }
+
+    &::before {
+      @extend %icon-font;
+
+      content: map-get($bootstrap-icons-map, "backspace-fill")
+    }
+  }
+
+  .hg-button-enter {
+    span {
+      @extend %display-none;
+    }
+
+    &::before {
+      @extend %icon-font;
+
+      content: map-get($bootstrap-icons-map, "box-arrow-in-right")
+    }
   }
 }

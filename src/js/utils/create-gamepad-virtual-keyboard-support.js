@@ -2,9 +2,10 @@ import Keyboard from 'simple-keyboard';
 import KeyNavigator from 'simple-keyboard-key-navigation';
 import hasButtonPressed from './has-button-pressed';
 import throttle from './throttle';
+import appendElementOnce from './append-element-once';
+import isElementWichNeedKeyboard from './is-element-which-need-keyboard';
 
 import { INT_MS_THROTTLE_DELAY } from '../constants';
-import appendElementOnce from './append-element-once';
 
 // {bksp} {tab} {lock} {shift}...
 const keyboardLayout = [
@@ -15,21 +16,11 @@ const keyboardLayout = [
   '@ {space}',
 ];
 
-const inputTypesWhichNeedKeyboard = [
-  'text',
+const DIGIT_ANALOG_THRESHOLD = 0.35;
 
-  'email',
+const DIGIT_ANALOG_THRESHOLD_NEGATIVE = DIGIT_ANALOG_THRESHOLD * -1;
 
-  'password',
-
-  'number',
-
-  'search',
-
-  'tel',
-
-  'url',
-];
+const STRING_CSS_CLASS_NAME = 'gamepad-virtual-keyboard';
 
 const convertThirdPartyKeyboardKeyToStandard = (key) => {
   switch (key) {
@@ -47,18 +38,6 @@ const convertThirdPartyKeyboardKeyToStandard = (key) => {
   }
 };
 
-const isInputTypeWhichNeedKeyboard = (element) => {
-  if (!element.matches('input')) {
-    return false;
-  }
-
-  const { type } = element || {};
-
-  return inputTypesWhichNeedKeyboard.includes(type);
-};
-
-const isElKeyboardTrigger = (element) => element.matches('textarea') || isInputTypeWhichNeedKeyboard(element);
-
 const initializeThirdPartyKeyboard = (className, onKeyPress) => {
   try {
     return new Keyboard(className, {
@@ -67,8 +46,6 @@ const initializeThirdPartyKeyboard = (className, onKeyPress) => {
       layout: {
         default: keyboardLayout,
       },
-
-      useMouseEvents: true,
 
       preventMouseDownDefault: true,
 
@@ -82,12 +59,6 @@ const initializeThirdPartyKeyboard = (className, onKeyPress) => {
     return null;
   }
 };
-
-const DIGIT_ANALOG_THRESHOLD = 0.35;
-
-const DIGIT_ANALOG_THRESHOLD_NEGATIVE = DIGIT_ANALOG_THRESHOLD * -1;
-
-const STRING_CSS_CLASS_NAME = 'gamepad-virtual-keyboard';
 
 const createGamepadVirtualKeyboardSupport = (client) => {
   const {
@@ -179,7 +150,7 @@ const createGamepadVirtualKeyboardSupport = (client) => {
   const update = () => {
     const { activeElement } = document;
 
-    if (isElKeyboardTrigger(activeElement)) {
+    if (isElementWichNeedKeyboard(activeElement)) {
       activate();
 
       return;
