@@ -7,7 +7,7 @@ const readFileUtf8 = async (path) => {
   }
 
   if (Array.isArray(path)) {
-    return path.reduce((previous, current) => previous + readFileUtf8(current), '');
+    return path.reduce(async (previous, current) => previous + await readFileUtf8(current), '');
   }
 
   try {
