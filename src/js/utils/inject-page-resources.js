@@ -18,6 +18,8 @@ const injectPageResources = async (page, options) => {
     css,
 
     js,
+
+    focus,
   } = options || {};
 
   log('log', 'files injection: start');
@@ -188,6 +190,11 @@ const injectPageResources = async (page, options) => {
       window.virtualKeyboardKeypressHandler(detail, window.browserGamepadSupport);
     });
   `);
+
+  if (focus) {
+    // a little hardcore, but effective way to prevent any programmatic window opening
+    await evaluatePageCode(page, 'window.open = console.log');
+  }
 };
 
 export default injectPageResources;

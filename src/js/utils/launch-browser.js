@@ -49,6 +49,8 @@ const launchBrowser = async (url, options) => {
 
     ignoreDefaultArgs: [
       '--enable-automation',
+
+      '--disable-extensions',
     ],
 
     args,

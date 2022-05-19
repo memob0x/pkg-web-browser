@@ -13,7 +13,7 @@ $bootstrap-icons-font-src: url($bootstrap-icons-font-src-path + "/bootstrap-icon
   src: $bootstrap-icons-font-src;
 }
 
-$keyboard-font-size: 1.7rem;
+$keyboard-font-size: 24px;
 
 .gamepad-virtual-keyboard {
   position: fixed;
@@ -38,7 +38,19 @@ $keyboard-font-size: 1.7rem;
     @include highlight;
   }
 
+  .hg-rows {
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+  }
+
+  .hg-row {
+    flex-grow: 1;
+  }
+
   .hg-button {
+    height: auto;
 
     &,
     [data-skbtn="@"] {
@@ -56,7 +68,6 @@ $keyboard-font-size: 1.7rem;
 
   %icon-font {
     font-family: $bootstrap-icons-font;
-    font-size: $keyboard-font-size - 0.5rem;
   }
 
   .hg-button-bksp {
