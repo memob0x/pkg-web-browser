@@ -15,6 +15,7 @@ import rollupJs from './utils/rollup-js';
 
 import { PATH_SRC } from '../../paths';
 import { STRING_INJECTED_FLAG_NAME } from './constants';
+import readFileUtf8 from './utils/read-file-utf8';
 
 const { option } = pkg;
 
@@ -67,6 +68,18 @@ const { options, targets } = option([
     description: 'Defines the final program internal process frequency time (in ms) for it to compute updates',
     example: "'pkg-browser-gamepad --loop-interval-time=6000'",
   },
+  {
+    name: 'custom-scripts',
+    type: 'string',
+    description: ' ',
+    example: "'pkg-browser-gamepad --custom-scripts=./script-1.css,./script-2.css'",
+  },
+  {
+    name: 'custom-styles',
+    type: 'string',
+    description: ' ',
+    example: "'pkg-browser-gamepad --custom-styles=./style-1.css,./style-2.css'",
+  },
 ]).run();
 
 const {
@@ -85,6 +98,10 @@ const {
   'pkg-target': pkgTarget = 'host',
 
   'loop-interval-time': loopIntervalTime = 75,
+
+  'custom-scripts': customScripts = '',
+
+  'custom-styles': customStyles = '',
 } = options || {};
 
 const [
@@ -101,7 +118,7 @@ const [
 
   const runtimeFile = resolve('.', runtimeFilename);
 
-  const [cssMain, jsBrowserGamepadSupport, jsLaunchBrowser] = await Promise.all([
+  const [cssMain, jsBrowserGamepadSupport, jsLaunchBrowser, extraJs = '', extraCss = ''] = await Promise.all([
     transpileScss(resolve(PATH_SRC, 'scss', 'main.scss')),
 
     rollupJs({
@@ -139,6 +156,10 @@ const [
         format: 'cjs',
       },
     }),
+
+    readFileUtf8(customScripts),
+
+    readFileUtf8(customStyles),
   ]);
 
   const launchBrowserOptions = {
@@ -154,9 +175,9 @@ const [
 
     focus,
 
-    css: cssMain,
+    css: cssMain + extraCss,
 
-    js: jsBrowserGamepadSupport,
+    js: jsBrowserGamepadSupport + extraJs,
 
     loopIntervalTime,
   };
