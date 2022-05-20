@@ -3,7 +3,15 @@ import sleep from './sleep';
 
 const loop = async (action, timeout, onError) => {
   try {
-    if (!action || !await action(action)) {
+    if (!action) {
+      log('log', 'no action specified, aborting...');
+
+      return;
+    }
+
+    const result = await action(action);
+
+    if (!result) {
       log('log', 'loop abortion in try block');
 
       return;

@@ -6,14 +6,22 @@ import log from './log';
 const injectPageResourcesOnce = async (page, options) => {
   const title = await getPageTitleExcerpt(page);
 
-  try {
-    await page.setBypassCSP(true);
+  const { bypassCSP } = options || {};
 
+  try {
     const isInjected = await hasPageInjectedResources(page);
 
     log('log', `page "${title}" injection:`, isInjected);
 
     if (!isInjected) {
+      log('log', 'bypassing csp');
+
+      if (bypassCSP) {
+        await page.setBypassCSP(true);
+      }
+
+      log('log', 'csp bypassed');
+
       log('log', `page "${title}" injecting`);
 
       await injectPageResources(page, options);
