@@ -1,10 +1,10 @@
-import getExcerpt from './get-excerpt';
+import getStringExcerpt from './get-string-excerpt';
 
 const getPageTitleExcerpt = async (page) => {
   try {
     const title = await page.title();
 
-    return `${getExcerpt(title)}...`;
+    return `${getStringExcerpt(title)}...`;
   } catch (e) {
     return '';
   }

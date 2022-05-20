@@ -1,4 +1,4 @@
-const getExcerpt = (string, chars = 40) => {
+const getStringExcerpt = (string, chars = 40) => {
   let excerpt = string || '';
 
   excerpt = excerpt.replace(/\n/g, ' ');
@@ -12,4 +12,4 @@ const getExcerpt = (string, chars = 40) => {
   return `${excerpt.slice(0, chars)}...`;
 };
 
-export default getExcerpt;
+export default getStringExcerpt;

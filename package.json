@@ -1,11 +1,11 @@
 {
-  "name": "pkg-website-gamepad",
+  "name": "pkg-website",
   "version": "0.0.1",
   "type": "module",
-  "description": "Control any website navigation with a gamepad",
+  "description": "Reduce a website to an executable file",
   "main": "dist/make.cjs",
   "bin": {
-    "pkg-website-gamepad": "dist/make.cjs"
+    "pkg-website": "dist/make.cjs"
   },
   "scripts": {
     "build": "node --experimental-specifier-resolution=node ./build.js",
@@ -18,10 +18,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/memob0x/pkg-website-gamepad"
+    "url": "github.com/memob0x/pkg-website"
   },
-  "keywords": [
-    "gamepad",
+  "keywords": [ 
     "browser",
     "pkg",
     "executable",
@@ -29,30 +28,28 @@
     "build",
     "kiosk",
     "chrome",
-    "controller"
+    "firefox",
+    "inject",
+    "binary"
   ],
   "author": "memob0x",
   "license": "MIT",
   "dependencies": {
-    "@babel/core": "^7.17.12",
+    "@babel/core": "^7.18.0",
     "@babel/eslint-parser": "^7.17.0",
     "@babel/eslint-plugin": "^7.17.7",
     "@rollup/plugin-commonjs": "^22.0.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "argv": "^0.0.2",
-    "bootstrap-icons": "^1.8.2",
     "chai": "^4.3.6",
     "eslint": "^8.15.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsdoc": "^39.2.9",
+    "eslint-plugin-jsdoc": "^39.3.0",
     "husky": "^8.0.1",
     "mocha": "^10.0.0",
-    "node-sass": "^7.0.1",
     "pkg": "^5.7.0",
-    "puppeteer": "^14.1.0",
-    "rollup": "^2.73.0",
-    "simple-keyboard": "^3.4.99",
-    "simple-keyboard-key-navigation": "^2.4.156"
+    "puppeteer": "^14.1.1",
+    "rollup": "^2.74.1"
   }
 }

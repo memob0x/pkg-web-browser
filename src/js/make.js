@@ -6,15 +6,12 @@ import { writeFile, unlink } from 'fs/promises';
 
 import { resolve } from 'path';
 
-import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import log from './utils/log';
-import transpileScss from './utils/transpile-scss';
 
 import rollupJs from './utils/rollup-js';
 
 import { PATH_SRC } from '../../paths';
-import { STRING_INJECTED_FLAG_NAME } from './constants';
 import readFileUtf8 from './utils/read-file-utf8';
 
 const { option } = pkg;
@@ -24,61 +21,73 @@ const { options, targets } = option([
     name: 'browser-width',
     type: 'int',
     description: 'Defines the opened website viewport width',
-    example: "'pkg-browser-gamepad --browser-width=720'",
+    example: "'pkg-browser --browser-width=720'",
   },
   {
     name: 'browser-height',
     type: 'int',
     description: 'Defines the opened website viewport height',
-    example: "'pkg-browser-gamepad --browser-height=576'",
+    example: "'pkg-browser --browser-height=576'",
   },
   {
     name: 'browser-executable-path',
     type: 'string',
     description: 'Defines the used browser executable path',
-    example: "'pkg-browser-gamepad --browser-executable-path=/usr/bin/chromium-browser'",
+    example: "'pkg-browser --browser-executable-path=/usr/bin/chromium-browser'",
   },
   {
     name: 'browser-user-data-dir',
     type: 'string',
     description: 'Defines the used browser path',
-    example: "'pkg-browser-gamepad --browser-user-data-dir=/home/user/.config/chromium/Default'",
+    example: "'pkg-browser --browser-user-data-dir=/home/user/.config/chromium/Default'",
   },
   {
-    name: 'kiosk',
-    type: 'boolean',
-    description: 'Defines whether the final program should open in kiosk mode or not',
-    example: "'pkg-browser-gamepad --kiosk'",
+    name: 'browser-product',
+    type: 'string',
+    description: ' ',
+    example: "'pkg-browser --args'",
+  },
+  {
+    name: 'browser-args',
+    type: 'csv',
+    description: ' ',
+    example: "'pkg-browser --args'",
+  },
+  {
+    name: 'browser-ignore-default-args',
+    type: 'csv',
+    description: ' ',
+    example: "'pkg-browser --args'",
   },
   {
     name: 'focus',
     type: 'boolean',
     description: 'Defines whether the final program should always stay on top disallowing other pages opening (popups)',
-    example: "'pkg-browser-gamepad --focus'",
+    example: "'pkg-browser --focus'",
   },
   {
     name: 'pkg-target',
     type: 'string',
     description: 'Defines the final program architecture',
-    example: "'pkg-browser-gamepad --pkg-target=node16-macos-x64'",
+    example: "'pkg-browser --pkg-target=node16-macos-x64'",
   },
   {
     name: 'loop-interval-time',
     type: 'string',
     description: 'Defines the final program internal process frequency time (in ms) for it to compute updates',
-    example: "'pkg-browser-gamepad --loop-interval-time=6000'",
+    example: "'pkg-browser --loop-interval-time=6000'",
   },
   {
     name: 'custom-scripts',
-    type: 'string',
+    type: 'csv',
     description: ' ',
-    example: "'pkg-browser-gamepad --custom-scripts=./script-1.css,./script-2.css'",
+    example: "'pkg-browser --custom-scripts=./script-1.css,./script-2.css'",
   },
   {
     name: 'custom-styles',
-    type: 'string',
+    type: 'csv',
     description: ' ',
-    example: "'pkg-browser-gamepad --custom-styles=./style-1.css,./style-2.css'",
+    example: "'pkg-browser --custom-styles=./style-1.css,./style-2.css'",
   },
 ]).run();
 
@@ -91,7 +100,11 @@ const {
 
   'browser-height': height = 1080,
 
-  kiosk = false,
+  'browser-product': product,
+
+  'browser-args': args = [],
+
+  'browser-ignore-default-args': ignoreDefaultArgs = [],
 
   focus = false,
 
@@ -105,8 +118,6 @@ const {
 } = options || {};
 
 const [
-  url = '//localhost',
-
   output = '',
 ] = targets || [];
 
@@ -118,27 +129,7 @@ const [
 
   const runtimeFile = resolve('.', runtimeFilename);
 
-  const [cssMain, jsBrowserGamepadSupport, jsLaunchBrowser, extraJs = '', extraCss = ''] = await Promise.all([
-    transpileScss(resolve(PATH_SRC, 'scss', 'main.scss')),
-
-    rollupJs({
-      input: {
-        input: resolve(PATH_SRC, 'js', 'browser.js'),
-
-        plugins: [
-          commonjs(),
-
-          nodeResolve(),
-        ],
-      },
-
-      output: {
-        format: 'iife',
-
-        name: STRING_INJECTED_FLAG_NAME,
-      },
-    }),
-
+  const [jsMainInNode, extraJs = '', extraCss = ''] = await Promise.all([
     rollupJs({
       input: {
         input: resolve(PATH_SRC, 'js', 'utils', 'launch-browser.js'),
@@ -171,13 +162,17 @@ const [
 
     height,
 
-    kiosk,
+    product,
+
+    args,
+
+    ignoreDefaultArgs,
 
     focus,
 
-    css: cssMain + extraCss,
+    css: extraCss,
 
-    js: jsBrowserGamepadSupport + extraJs,
+    js: extraJs,
 
     loopIntervalTime,
   };
@@ -185,7 +180,7 @@ const [
   await writeFile(
     runtimeFile,
 
-    `${jsLaunchBrowser}\n\nlaunchBrowser(${JSON.stringify(url)}, ${JSON.stringify(launchBrowserOptions)});`,
+    `${jsMainInNode}\n\nlaunchBrowser(${JSON.stringify(launchBrowserOptions)});`,
   );
 
   try {

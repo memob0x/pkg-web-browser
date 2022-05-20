@@ -1,49 +1,13 @@
 import puppeteer from 'puppeteer';
-import getPageTitleExcerpt from './get-page-title-excerpt';
+import bringPageToFront from './bring-page-to-front';
 import identifyPages from './identify-pages';
+import injectPageAntiPopupPolicy from './inject-page-anti-popup-policy';
 import injectPageResourcesOnce from './inject-page-resources-once';
 import log from './log';
 import loop from './loop';
 import triggerPageClose from './trigger-page-close';
 
-const getBrowserArgs = (product, url, kiosk, width, height) => {
-  const base = {
-    chrome: [
-      `--app=${url}`,
-
-      // NOTE: "new-window" flag proved to be helpful
-      // when the given browser executable has open windows/tabs
-      // with the given browser profile...
-      '--new-window',
-    ],
-
-    firefox: [
-      url,
-    ],
-  };
-
-  const args = base[product];
-
-  return args.concat(kiosk ? ['--kiosk'] : [`--window-size=${width},${height}`]);
-};
-
-const supportedBrowser = ['firefox', 'chrome'];
-
-const { length: supportedBrowserLength } = supportedBrowser;
-
-const getBrowserType = (executablePath) => {
-  for (let i = 0; i < supportedBrowserLength; i += 1) {
-    const browser = supportedBrowser[i];
-
-    if (executablePath && executablePath.includes(browser)) {
-      return browser;
-    }
-  }
-
-  return 'unknown';
-};
-
-const launchBrowser = async (url, options) => {
+const launchBrowser = async (options) => {
   const {
     width,
 
@@ -53,16 +17,18 @@ const launchBrowser = async (url, options) => {
 
     userDataDir,
 
-    kiosk,
-
     focus,
 
     loopIntervalTime,
+
+    product,
+
+    ignoreDefaultArgs,
+
+    args,
   } = options || {};
 
-  const product = getBrowserType(executablePath);
-
-  const viewport = {
+  const defaultViewport = {
     width,
 
     height,
@@ -77,15 +43,11 @@ const launchBrowser = async (url, options) => {
 
     executablePath,
 
-    ignoreDefaultArgs: [
-      '--enable-automation',
+    ignoreDefaultArgs,
 
-      '--disable-extensions',
-    ],
+    args,
 
-    args: getBrowserArgs(product, url, kiosk, width, height),
-
-    defaultViewport: viewport,
+    defaultViewport,
   });
 
   return loop(
@@ -104,7 +66,7 @@ const launchBrowser = async (url, options) => {
       }
 
       let tasks = [
-        mainPage.setViewport(viewport),
+        mainPage.setViewport(defaultViewport),
       ];
 
       const { length: extraPagesCount } = otherPages || [];
@@ -117,18 +79,26 @@ const launchBrowser = async (url, options) => {
 
       const injectionTargetPages = focus ? [mainPage] : allPages;
 
-      tasks.concat(injectionTargetPages.map((page) => injectPageResourcesOnce(page, {
-        ...options,
+      tasks = tasks.concat(
+        injectionTargetPages.map((page) => injectPageResourcesOnce(page, options)),
+      );
 
-        bypassCSP: product === 'chrome', // NOTE: doesn't work in firefox
-      })));
+      if (focus) {
+        log('log', 'focus mode');
+
+        tasks = tasks.concat(
+          injectionTargetPages.map(injectPageAntiPopupPolicy),
+        );
+      }
 
       if (focus && extraPagesCount) {
-        log('log', `focus mode: page "${await getPageTitleExcerpt(mainPage)}" taken to front`);
+        tasks.push(
+          bringPageToFront(mainPage),
+        );
 
-        tasks.push(mainPage.bringToFront());
-
-        tasks = tasks.concat(otherPages.map(triggerPageClose));
+        tasks = tasks.concat(
+          otherPages.map(triggerPageClose),
+        );
       }
 
       await Promise.all(tasks);
@@ -147,6 +117,13 @@ const launchBrowser = async (url, options) => {
         return true;
       }
 
+      if (message.includes('Protocol error')) {
+        log('log', 'history navigation'); // TODO: check
+
+        // continue
+        return true;
+      }
+
       log('error', `unhandled error "${message}", aborting`);
 
       // break
@@ -155,4 +132,5 @@ const launchBrowser = async (url, options) => {
   );
 };
 
+// eslint-disable-next-line import/no-unused-modules
 export default launchBrowser;

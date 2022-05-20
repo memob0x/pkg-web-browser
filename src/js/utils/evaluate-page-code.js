@@ -1,8 +1,10 @@
-import getExcerpt from './get-excerpt';
+import getStringExcerpt from './get-string-excerpt';
 import log from './log';
 
 const evaluatePageCode = async (page, code) => {
-  let codeExcerpt = typeof code === 'string' ? getExcerpt(code) : code;
+  let codeExcerpt = typeof code === 'string' ? code : `${code}`;
+
+  codeExcerpt = getStringExcerpt(codeExcerpt);
 
   codeExcerpt = codeExcerpt.replace(/\r?\n|\r/g, ' ');
 
@@ -15,7 +17,7 @@ const evaluatePageCode = async (page, code) => {
 
     return value;
   } catch (e) {
-    log('error', 'error during page code evaluation');
+    log('error', `error during page code evaluation (${codeExcerpt}), error: ${e.message}`);
 
     return null;
   }
