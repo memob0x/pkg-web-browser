@@ -1,7 +1,7 @@
 import commonjs from '@rollup/plugin-commonjs';
 import { resolve } from 'path';
 import { writeFile, mkdir } from 'fs/promises';
-import rollupJs from './src/js/utils/rollup-js';
+import rollupJs from './src/utils/rollup-js';
 
 import {
   PATH_SRC,
@@ -20,7 +20,7 @@ writeFile(
 
   await rollupJs({
     input: {
-      input: resolve(PATH_SRC, 'js', 'make.js'),
+      input: resolve(PATH_SRC, 'make.js'),
 
       plugins: [
         commonjs(),

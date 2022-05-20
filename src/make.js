@@ -11,7 +11,7 @@ import log from './utils/log';
 
 import rollupJs from './utils/rollup-js';
 
-import { PATH_SRC } from '../../paths';
+import { PATH_SRC } from '../paths';
 import readFileUtf8 from './utils/read-file-utf8';
 
 const { option } = pkg;
@@ -132,7 +132,7 @@ const [
   const [jsMainInNode, extraJs = '', extraCss = ''] = await Promise.all([
     rollupJs({
       input: {
-        input: resolve(PATH_SRC, 'js', 'utils', 'launch-browser.js'),
+        input: resolve(PATH_SRC, 'utils', 'launch-browser.js'),
 
         plugins: [
           commonjs(),

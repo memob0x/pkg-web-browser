@@ -1,5 +1,5 @@
 import chai from 'chai';
-import sleep from '../../src/js/utils/sleep';
+import sleep from '../../src/utils/sleep';
 
 const { expect } = chai;
 
