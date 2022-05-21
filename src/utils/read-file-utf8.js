@@ -2,10 +2,6 @@ import { readFile } from 'fs/promises';
 import { resolve } from 'path';
 
 const readFileUtf8 = async (path) => {
-  if (typeof path === 'string' && path.includes(',')) {
-    return readFileUtf8(path.split(','));
-  }
-
   if (Array.isArray(path)) {
     return path.reduce(async (previous, current) => previous + await readFileUtf8(current), '');
   }

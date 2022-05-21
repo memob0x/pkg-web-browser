@@ -1,10 +1,11 @@
-import getPageTitleExcerpt from './get-page-title-excerpt';
+import getPageTitle from './get-page-title';
+import getStringExcerpt from './get-string-excerpt';
 import hasPageInjectedResources from './has-page-injected-resources';
 import injectPageResources from './inject-page-resources';
 import log from './log';
 
 const injectPageResourcesOnce = async (page, options) => {
-  const title = await getPageTitleExcerpt(page);
+  const title = getStringExcerpt(await getPageTitle(page));
 
   try {
     const isInjected = await hasPageInjectedResources(page);

@@ -1,135 +1,169 @@
 import puppeteer from 'puppeteer';
 import bringPageToFront from './bring-page-to-front';
-import identifyPages from './identify-pages';
+import executeFunctionWithRetry from './execute-function-with-retry';
+import getPageTitle from './get-page-title';
+import getPagesOrDefault from './get-pages-or-default';
 import injectPageAntiPopupPolicy from './inject-page-anti-popup-policy';
 import injectPageResourcesOnce from './inject-page-resources-once';
 import log from './log';
-import loop from './loop';
 import triggerPageClose from './trigger-page-close';
+
+const executeBrowserProcessLoopIteration = async (browser, mainPage, options) => {
+  if (!browser || !mainPage) {
+    log('error', 'no browser or page foun, nothing to do');
+
+    // break
+    return;
+  }
+
+  const { focus } = options || {};
+
+  try {
+    log('log', 'polling iteration started');
+
+    const pages = await getPagesOrDefault(browser);
+
+    log('log', 'retrieved pages');
+
+    const otherPages = await pages.reduce(async (prev, curr) => {
+      if (curr === mainPage) {
+        return prev;
+      }
+
+      const currTitle = await getPageTitle(curr);
+
+      if (currTitle.includes('DevTools')) {
+        return prev;
+      }
+
+      return (await prev).concat(curr);
+    }, Promise.resolve([]));
+
+    const { length: extraPagesCount } = otherPages || [];
+
+    if (extraPagesCount > 0) {
+      log('log', `extra pages count: ${extraPagesCount}`);
+    }
+
+    const injectionTargetPages = focus ? [mainPage] : pages;
+
+    let tasks = [];
+
+    tasks = tasks.concat(
+      injectionTargetPages.map((page) => injectPageResourcesOnce(page, options)),
+    );
+
+    if (focus) {
+      log('log', 'focus mode, will try my best to tackle all popups and windows opening');
+
+      tasks = tasks.concat(
+        injectionTargetPages.map(injectPageAntiPopupPolicy),
+      );
+    }
+
+    if (focus && extraPagesCount) {
+      tasks.push(
+        bringPageToFront(mainPage),
+      );
+
+      tasks = tasks.concat(
+        otherPages.map(triggerPageClose),
+      );
+    }
+
+    await Promise.all(tasks);
+
+    log('log', 'polling iteration ended');
+
+    // continue
+    await executeBrowserProcessLoopIteration(browser, mainPage, options);
+  } catch ({ message }) {
+    log('log', `handled error (${message})`);
+
+    if (
+      // browser is still going
+      browser.isConnected()
+    ) {
+      log('log', 'restarting loop');
+
+      // continue
+      await executeBrowserProcessLoopIteration(browser, mainPage, options);
+
+      return;
+    }
+
+    log('log', 'not restarting loop');
+
+    // break
+  }
+};
 
 const launchBrowser = async (options) => {
   const {
-    width,
-
-    height,
+    defaultViewport,
 
     executablePath,
 
     userDataDir,
-
-    focus,
-
-    loopIntervalTime,
 
     product,
 
     ignoreDefaultArgs,
 
     args,
+
+    url,
   } = options || {};
 
-  const defaultViewport = {
-    width,
+  log('log', 'launching browser');
 
-    height,
-  };
+  let browser = null;
 
-  const browser = await puppeteer.launch({
-    headless: false,
+  try {
+    browser = await executeFunctionWithRetry(() => puppeteer.launch({
+      headless: false,
 
-    product,
+      product,
 
-    userDataDir,
+      userDataDir,
 
-    executablePath,
+      executablePath,
 
-    ignoreDefaultArgs,
+      ignoreDefaultArgs,
 
-    args,
+      args,
 
-    defaultViewport,
-  });
+      defaultViewport,
+    }), 1);
+  } catch (e) {
+    log('error', `browser failed to launch, nothing to do about it (Error: ${e.message}).`);
 
-  return loop(
-    async () => {
-      const {
-        main: mainPage,
+    return;
+  }
 
-        other: otherPages,
-      } = await identifyPages(browser);
+  log('log', 'browser launched');
 
-      if (!mainPage) {
-        log('error', 'no page found');
+  log('log', 'launching main page');
 
-        // break
-        return false;
-      }
+  const mainPage = await browser.newPage();
 
-      let tasks = [
-        mainPage.setViewport(defaultViewport),
-      ];
+  log('log', 'main page launched');
 
-      const { length: extraPagesCount } = otherPages || [];
+  log('log', `navigating ${url}`);
 
-      if (extraPagesCount) {
-        log('log', `extra pages count: ${extraPagesCount}`);
-      }
+  await mainPage.goto(url);
 
-      const allPages = [mainPage, ...otherPages];
+  log('log', `${url} navigated`);
 
-      const injectionTargetPages = focus ? [mainPage] : allPages;
+  log('log', 'main loop start');
 
-      tasks = tasks.concat(
-        injectionTargetPages.map((page) => injectPageResourcesOnce(page, options)),
-      );
+  await executeBrowserProcessLoopIteration(browser, mainPage, options);
 
-      if (focus) {
-        log('log', 'focus mode');
+  log('log', 'main loop ended');
 
-        tasks = tasks.concat(
-          injectionTargetPages.map(injectPageAntiPopupPolicy),
-        );
-      }
+  browser.close();
 
-      if (focus && extraPagesCount) {
-        tasks.push(
-          bringPageToFront(mainPage),
-        );
-
-        tasks = tasks.concat(
-          otherPages.map(triggerPageClose),
-        );
-      }
-
-      await Promise.all(tasks);
-
-      // continue
-      return true;
-    },
-
-    loopIntervalTime,
-
-    ({ message }) => {
-      if (message.includes('Execution context was destroyed')) {
-        log('log', 'page reload');
-
-        // continue
-        return true;
-      }
-
-      if (message.includes('Protocol error')) {
-        log('log', 'history navigation'); // TODO: check
-
-        // continue
-        return true;
-      }
-
-      log('error', `unhandled error "${message}", aborting`);
-
-      // break
-      return false;
-    },
-  );
+  log('log', 'ok, bye');
 };
 
 // eslint-disable-next-line import/no-unused-modules

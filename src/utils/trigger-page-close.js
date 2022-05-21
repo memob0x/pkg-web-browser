@@ -1,8 +1,9 @@
-import getPageTitleExcerpt from './get-page-title-excerpt';
+import getPageTitle from './get-page-title';
+import getStringExcerpt from './get-string-excerpt';
 import log from './log';
 
 const triggerPageClose = async (page) => {
-  const title = await getPageTitleExcerpt(page);
+  const title = getStringExcerpt(await getPageTitle(page));
 
   try {
     log('log', `page "${title}" close`);

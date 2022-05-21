@@ -11,7 +11,7 @@
     "build": "node --experimental-specifier-resolution=node ./build.js",
     "pkg-src": "node --experimental-specifier-resolution=node ./src/make.js",
     "pkg-dist": "npm run build && node ./dist/make.cjs",
-    "test:unit": "./node_modules/.bin/mocha --experimental-specifier-resolution=node ./test/unit/*.spec.*",
+    "test:unit": "./node_modules/.bin/mocha --experimental-specifier-resolution=node ./src/**/*.test.js",
     "test": "npm run test:unit",
     "lint": "./node_modules/.bin/eslint --ext .js . --fix",
     "prepare": "husky install"

@@ -1,8 +1,9 @@
-import getPageTitleExcerpt from './get-page-title-excerpt';
+import getPageTitle from './get-page-title';
+import getStringExcerpt from './get-string-excerpt';
 import log from './log';
 
 const bringPageToFront = async (page) => {
-  log('log', `focus mode: page "${await getPageTitleExcerpt(page)}" taken to front`);
+  log('log', `focus mode: page "${getStringExcerpt(await getPageTitle(page))}" taken to front`);
 
   return page.bringToFront();
 };

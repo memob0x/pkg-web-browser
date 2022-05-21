@@ -18,8 +18,16 @@ const log = (type, ...args) => {
     return false;
   }
 
+  const date = new Date();
+
+  const argsWithTime = [
+    `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
+
+    ...args,
+  ];
+
   // eslint-disable-next-line no-console
-  console[type](...args);
+  console[type](...argsWithTime);
 
   return true;
 };

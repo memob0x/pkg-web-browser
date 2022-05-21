@@ -72,12 +72,6 @@ const { options, targets } = option([
     example: "'pkg-browser --pkg-target=node16-macos-x64'",
   },
   {
-    name: 'loop-interval-time',
-    type: 'string',
-    description: 'Defines the final program internal process frequency time (in ms) for it to compute updates',
-    example: "'pkg-browser --loop-interval-time=6000'",
-  },
-  {
     name: 'custom-scripts',
     type: 'csv',
     description: ' ',
@@ -110,14 +104,14 @@ const {
 
   'pkg-target': pkgTarget = 'host',
 
-  'loop-interval-time': loopIntervalTime = 75,
-
   'custom-scripts': customScripts = '',
 
   'custom-styles': customStyles = '',
 } = options || {};
 
 const [
+  url = '',
+
   output = '',
 ] = targets || [];
 
@@ -153,14 +147,20 @@ const [
     readFileUtf8(customStyles),
   ]);
 
+  const defaultViewport = {
+    width,
+
+    height,
+  };
+
   const launchBrowserOptions = {
+    url,
+
     executablePath,
 
     userDataDir,
 
-    width,
-
-    height,
+    defaultViewport,
 
     product,
 
@@ -173,8 +173,6 @@ const [
     css: extraCss,
 
     js: extraJs,
-
-    loopIntervalTime,
   };
 
   await writeFile(
