@@ -2,3 +2,4 @@ node_modules
 chrome*
 runtime*
 dist
+*.exe

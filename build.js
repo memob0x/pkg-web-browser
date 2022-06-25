@@ -1,54 +1,17 @@
-import commonjs from '@rollup/plugin-commonjs';
 import { resolve } from 'path';
-import { writeFile, mkdir } from 'fs/promises';
-import rollupJs from './src/utils/rollup-js';
+import { mkdir } from 'fs/promises';
+import createLibraryBundleFile from './src/node/create-library-bundle-file';
 
-import {
-  PATH_SRC,
-
-  PATH_DIST,
-} from './paths';
+const outputPath = resolve('./dist');
 
 try {
-  await mkdir(PATH_DIST);
+  await mkdir(outputPath);
 } catch (e) {
   //
 }
 
-writeFile(
-  resolve(PATH_DIST, 'make.cjs'),
+await createLibraryBundleFile(
+  resolve('./src/index.js'),
 
-  await rollupJs({
-    input: {
-      input: resolve(PATH_SRC, 'make.js'),
-
-      plugins: [
-        commonjs(),
-      ],
-
-      external: [
-        'argv',
-
-        'globby',
-
-        'pkg',
-
-        'path',
-
-        'node-sass',
-
-        'rollup',
-
-        '@rollup/plugin-commonjs',
-
-        '@rollup/plugin-node-resolve',
-
-        'fs/promises',
-      ],
-    },
-
-    output: {
-      format: 'cjs',
-    },
-  }),
+  `${outputPath}/index.cjs`,
 );

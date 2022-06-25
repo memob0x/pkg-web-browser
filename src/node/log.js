@@ -1,6 +1,6 @@
-import { BOOL_LOG_LEVEL } from '../constants';
+const BOOL_LOG_LEVEL = 3; // 1 = only errors, 2 = errors and warnings, 3 = all
 
-const log = (type, ...args) => {
+const log = async (type, arg) => {
   const isError = type === 'error';
   const isWarning = type === 'warn';
   const isLog = type === 'log';
@@ -20,14 +20,12 @@ const log = (type, ...args) => {
 
   const date = new Date();
 
-  const argsWithTime = [
+  // eslint-disable-next-line no-console
+  console[type](
     `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`,
 
-    ...args,
-  ];
-
-  // eslint-disable-next-line no-console
-  console[type](...argsWithTime);
+    typeof arg === 'function' ? await arg() : arg,
+  );
 
   return true;
 };

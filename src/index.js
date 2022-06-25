@@ -1,20 +1,7 @@
-import pkg from 'argv';
+import argv from 'argv';
+import createBinaryCreatorFile from './node/create-binary-creator-file';
 
-import { exec } from 'pkg';
-
-import { writeFile, unlink } from 'fs/promises';
-
-import { resolve } from 'path';
-
-import commonjs from '@rollup/plugin-commonjs';
-import log from './utils/log';
-
-import rollupJs from './utils/rollup-js';
-
-import { PATH_SRC } from '../paths';
-import readFileUtf8 from './utils/read-file-utf8';
-
-const { option } = pkg;
+const { option } = argv;
 
 const { options, targets } = option([
   {
@@ -102,104 +89,49 @@ const {
 
   focus = false,
 
-  'pkg-target': pkgTarget = 'host',
+  'pkg-target': binaryFileArch = 'host',
 
-  'custom-scripts': customScripts = '',
+  'custom-scripts': scripts = '',
 
-  'custom-styles': customStyles = '',
+  'custom-styles': styles = '',
 } = options || {};
 
 const [
   url = '',
 
-  output = '',
+  binaryFilePath = '',
 ] = targets || [];
 
 (async () => {
-  const runtimeFilePrefix = 'runtime-';
-  const runtimeFileExtension = '.js';
+  await createBinaryCreatorFile(
+    binaryFileArch,
 
-  const runtimeFilename = `${runtimeFilePrefix}${Date.now()}${Math.random()}${runtimeFileExtension}`;
+    binaryFilePath,
 
-  const runtimeFile = resolve('.', runtimeFilename);
+    {
+      styles,
 
-  const [jsMainInNode, extraJs = '', extraCss = ''] = await Promise.all([
-    rollupJs({
-      input: {
-        input: resolve(PATH_SRC, 'utils', 'launch-browser.js'),
+      scripts,
 
-        plugins: [
-          commonjs(),
-        ],
+      url,
 
-        external: ['puppeteer'],
+      executablePath,
+
+      userDataDir,
+
+      defaultViewport: {
+        width,
+
+        height,
       },
 
-      output: {
-        exports: 'default',
-        name: 'launchBrowser',
-        format: 'cjs',
-      },
-    }),
+      product,
 
-    readFileUtf8(customScripts),
+      args,
 
-    readFileUtf8(customStyles),
-  ]);
+      ignoreDefaultArgs,
 
-  const defaultViewport = {
-    width,
-
-    height,
-  };
-
-  const launchBrowserOptions = {
-    url,
-
-    executablePath,
-
-    userDataDir,
-
-    defaultViewport,
-
-    product,
-
-    args,
-
-    ignoreDefaultArgs,
-
-    focus,
-
-    css: extraCss,
-
-    js: extraJs,
-  };
-
-  await writeFile(
-    runtimeFile,
-
-    `${jsMainInNode}\n\nlaunchBrowser(${JSON.stringify(launchBrowserOptions)});`,
+      focus,
+    },
   );
-
-  try {
-    await exec([
-      `./${runtimeFilename}`,
-
-      '--config',
-      './pkg.json',
-
-      '--compress',
-      'GZip',
-
-      '--target',
-      pkgTarget,
-
-      '--output',
-      output,
-    ]);
-  } catch (e) {
-    log('error', e);
-  }
-
-  await unlink(`./${runtimeFilename}`);
 })();

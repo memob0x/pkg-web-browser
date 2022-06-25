@@ -3,14 +3,13 @@
   "version": "0.0.1",
   "type": "module",
   "description": "Reduce a website to an executable file",
-  "main": "dist/make.cjs",
+  "main": "dist/index.cjs",
   "bin": {
-    "pkg-website": "dist/make.cjs"
+    "pkg-website": "dist/index.cjs"
   },
   "scripts": {
     "build": "node --experimental-specifier-resolution=node ./build.js",
-    "pkg-src": "node --experimental-specifier-resolution=node ./src/make.js",
-    "pkg-dist": "npm run build && node ./dist/make.cjs",
+    "pkg": "npm run build && node ./dist/index.cjs",
     "test:unit": "./node_modules/.bin/mocha --experimental-specifier-resolution=node ./src/**/*.test.js",
     "test": "npm run test:unit",
     "lint": "./node_modules/.bin/eslint --ext .js . --fix",
@@ -35,21 +34,21 @@
   "author": "memob0x",
   "license": "MIT",
   "dependencies": {
-    "@babel/core": "^7.18.0",
-    "@babel/eslint-parser": "^7.17.0",
+    "@babel/core": "^7.18.5",
+    "@babel/eslint-parser": "^7.18.2",
     "@babel/eslint-plugin": "^7.17.7",
-    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-commonjs": "^22.0.1",
     "@rollup/plugin-node-resolve": "^13.3.0",
     "argv": "^0.0.2",
     "chai": "^4.3.6",
-    "eslint": "^8.15.0",
+    "eslint": "^8.18.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-jsdoc": "^39.3.0",
+    "eslint-plugin-jsdoc": "^39.3.3",
     "husky": "^8.0.1",
     "mocha": "^10.0.0",
     "pkg": "^5.7.0",
-    "puppeteer": "^14.1.1",
-    "rollup": "^2.74.1"
+    "puppeteer": "^15.1.1",
+    "rollup": "^2.75.7"
   }
 }
