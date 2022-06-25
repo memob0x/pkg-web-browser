@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [16.14.0]
 
     steps:
       - uses: actions/checkout@v2
@@ -18,6 +18,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm test
-      - run: npm run pkg-dist
+      - run: npm run pkg
         env:
           CI: true
