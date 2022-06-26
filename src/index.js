@@ -1,5 +1,5 @@
 import argv from 'argv';
-import createBinaryCreatorFile from './node/create-binary-creator-file';
+import createBinaryCreatorFile from './node/create-binary-file';
 
 const { option } = argv;
 
@@ -102,36 +102,34 @@ const [
   binaryFilePath = '',
 ] = targets || [];
 
-(async () => {
-  await createBinaryCreatorFile(
-    binaryFileArch,
+createBinaryCreatorFile(
+  binaryFileArch,
 
-    binaryFilePath,
+  binaryFilePath,
 
-    {
-      styles,
+  {
+    styles,
 
-      scripts,
+    scripts,
 
-      url,
+    url,
 
-      executablePath,
+    executablePath,
 
-      userDataDir,
+    userDataDir,
 
-      defaultViewport: {
-        width,
+    defaultViewport: {
+      width,
 
-        height,
-      },
-
-      product,
-
-      args,
-
-      ignoreDefaultArgs,
-
-      focus,
+      height,
     },
-  );
-})();
+
+    product,
+
+    args,
+
+    ignoreDefaultArgs,
+
+    focus,
+  },
+);

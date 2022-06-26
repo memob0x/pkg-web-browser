@@ -1,6 +1,7 @@
 {
   "assets": [
     "node_modules/*",
-    "runtime-*.js"
+    "runtime-*.js",
+    "local-browser-*/**/*"
   ]
 }

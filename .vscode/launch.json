@@ -17,18 +17,38 @@
     {
       "type": "pwa-node",
       "request": "launch",
-      "name": "Build win binary",
+      "name": "Build win binary with bundled browser",
       "skipFiles": [
         "<node_internals>/**"
       ],
       "runtimeArgs": [
         "run",
-        "pkg"
+        "pkg",
+        "--",
+        "--pkg-target=node16-win-x64",
       ],
       "runtimeExecutable": "npm",
       "args": [
+        "http://youtube.com/",
+        "./youtube.exe"
+      ]
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Build win binary with external browser",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "runtimeArgs": [
+        "run",
+        "pkg",
+        "--",
         "--pkg-target=node16-win-x64",
         "--browser-executable-path=C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+      ],
+      "runtimeExecutable": "npm",
+      "args": [
         "http://youtube.com/",
         "./youtube.exe"
       ]

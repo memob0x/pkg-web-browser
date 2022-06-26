@@ -19,7 +19,7 @@
     "type": "git",
     "url": "github.com/memob0x/pkg-website"
   },
-  "keywords": [ 
+  "keywords": [
     "browser",
     "pkg",
     "executable",
@@ -48,7 +48,7 @@
     "husky": "^8.0.1",
     "mocha": "^10.0.0",
     "pkg": "^5.7.0",
-    "puppeteer": "^15.1.1",
+    "puppeteer-core": "^15.1.1",
     "rollup": "^2.75.7"
   }
 }

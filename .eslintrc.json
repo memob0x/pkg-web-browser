@@ -19,7 +19,7 @@
       {
         "unusedExports": true,
         "src": [
-          "./src/**/*.js"
+          "./**/*.js"
         ]
       }
     ]

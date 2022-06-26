@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import { join } from 'path';
 import awaitSafely from '../utils/await-safely';
 import callWithRetry from '../utils/call-with-retry';
 import getStringExcerpt from '../utils/get-string-excerpt';
@@ -17,7 +18,6 @@ const executeBrowserProcessLoopIteration = async (browser, mainPage, options) =>
   }
 
   const { focus, styles, scripts } = options || {};
-
   try {
     await log('log', 'polling iteration started');
 
@@ -154,7 +154,13 @@ const launchBrowser = async (options) => {
   const {
     defaultViewport,
 
-    executablePath,
+    isLocalBrowser,
+
+    localBrowserFolderName,
+
+    localBrowserFolderPath,
+
+    executablePath: executablePathOpt,
 
     userDataDir,
 
@@ -171,7 +177,9 @@ const launchBrowser = async (options) => {
 
   await log('log', `ignored args: ${ignoreDefaultArgs}`);
 
-  await log('log', 'launching browser');
+  const executablePath = isLocalBrowser ? join(__dirname, `./${localBrowserFolderName}${executablePathOpt.split(localBrowserFolderPath)[1]}`) : executablePathOpt;
+
+  await log('log', `launching browser ${executablePath}`);
 
   const browser = await awaitWithTimeout(
     puppeteer.launch({

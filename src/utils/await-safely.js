@@ -1,4 +1,4 @@
-const awaitSafaly = async (promise, defaultReturnedValue) => {
+const awaitSafely = async (promise, defaultReturnedValue) => {
   try {
     return await promise;
   } catch (_e) {
@@ -6,4 +6,4 @@ const awaitSafaly = async (promise, defaultReturnedValue) => {
   }
 };
 
-export default awaitSafaly;
+export default awaitSafely;
