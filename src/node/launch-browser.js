@@ -1,11 +1,14 @@
 import puppeteer from 'puppeteer-core';
 import { join } from 'path';
+
 import awaitSafely from '../utils/await-safely';
 import callWithRetry from '../utils/call-with-retry';
 import getStringExcerpt from '../utils/get-string-excerpt';
 import disallowNewPages from '../browser/disallow-new-pages';
 import awaitWithTimeout from '../utils/await-with-timeout';
+import getBrowserExecutablePath from './get-browser-executable-path';
 import log from './log';
+import getBrowserPlatform from './get-browser-platform';
 
 const STRING_INJECTED_FLAG_NAME = 'pkgWebsite';
 
@@ -154,14 +157,6 @@ const launchBrowser = async (options) => {
   const {
     defaultViewport,
 
-    isLocalBrowser,
-
-    localBrowserFolderName,
-
-    localBrowserFolderPath,
-
-    executablePath: executablePathOpt,
-
     userDataDir,
 
     product,
@@ -171,15 +166,21 @@ const launchBrowser = async (options) => {
     args,
 
     url,
+
+    executablePath,
+
+    downloadHost,
+
+    binaryFileArch,
+
+    revision,
   } = options || {};
 
   await log('log', `args: ${args}`);
 
   await log('log', `ignored args: ${ignoreDefaultArgs}`);
 
-  const executablePath = isLocalBrowser ? join(__dirname, `./${localBrowserFolderName}${executablePathOpt.split(localBrowserFolderPath)[1]}`) : executablePathOpt;
-
-  await log('log', `launching browser ${executablePath}`);
+  await log('log', 'launching browser');
 
   const browser = await awaitWithTimeout(
     puppeteer.launch({
@@ -191,7 +192,19 @@ const launchBrowser = async (options) => {
 
       userDataDir,
 
-      executablePath,
+      executablePath: await getBrowserExecutablePath(
+        executablePath,
+
+        join(process.cwd(), '.pkg-web-browser'),
+
+        downloadHost,
+
+        getBrowserPlatform(binaryFileArch),
+
+        product,
+
+        revision,
+      ),
 
       ignoreDefaultArgs,
 

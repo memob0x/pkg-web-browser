@@ -14,6 +14,8 @@ const createLibraryBundleFile = async (inputPath, outputPath) => writeFile(
       ],
 
       external: [
+        'puppeteer-core',
+
         'fs/promises',
 
         'path',
@@ -25,8 +27,6 @@ const createLibraryBundleFile = async (inputPath, outputPath) => writeFile(
         'rollup',
 
         '@rollup/plugin-commonjs',
-
-        '@rollup/plugin-node-resolve',
       ],
     },
 

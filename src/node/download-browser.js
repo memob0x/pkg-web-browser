@@ -4,15 +4,15 @@ import log from './log';
 const downloadBrowser = async (
   path,
 
-  host = 'https://archive.mozilla.org/pub/firefox/nightly/2022/02/2022-02-07-06-58-16-mozilla-central',
+  host, // https://archive.mozilla.org/pub/firefox/nightly/2022/02/2022-02-07-06-58-16-mozilla-central
 
-  platform = 'win64',
+  platform, // win32 | win64 | mac | mac_arm ...
 
-  product = 'firefox',
+  product = 'chrome', // firefox | chrome
 
-  revision = '98.0a1',
+  revision = '1018312', // 98.0a1 | 1018312
 ) => {
-  log('log', `downloading browser ${product} ${revision} ${platform} from ${host}`);
+  log('log', `downloading browser ${product} ${revision} ${platform} ${host ? `from ${host}` : ''}`);
 
   const browserFetcher = puppeteer.createBrowserFetcher({
     host,

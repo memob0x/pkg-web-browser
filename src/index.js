@@ -1,5 +1,5 @@
 import argv from 'argv';
-import createBinaryCreatorFile from './node/create-binary-file';
+import createBinaryFile from './node/create-binary-file';
 
 const { option } = argv;
 
@@ -30,6 +30,18 @@ const { options, targets } = option([
   },
   {
     name: 'browser-product',
+    type: 'string',
+    description: ' ',
+    example: "'pkg-browser --args'",
+  },
+  {
+    name: 'browser-download-host',
+    type: 'string',
+    description: ' ',
+    example: "'pkg-browser --args'",
+  },
+  {
+    name: 'browser-revision',
     type: 'string',
     description: ' ',
     example: "'pkg-browser --args'",
@@ -83,6 +95,10 @@ const {
 
   'browser-product': product,
 
+  'browser-download-host': downloadHost,
+
+  'browser-revision': revision,
+
   'browser-args': args = [],
 
   'browser-ignore-default-args': ignoreDefaultArgs = [],
@@ -102,7 +118,7 @@ const [
   binaryFilePath = '',
 ] = targets || [];
 
-createBinaryCreatorFile(
+createBinaryFile(
   binaryFileArch,
 
   binaryFilePath,
@@ -125,6 +141,12 @@ createBinaryCreatorFile(
     },
 
     product,
+
+    downloadHost,
+
+    revision,
+
+    binaryFileArch,
 
     args,
 

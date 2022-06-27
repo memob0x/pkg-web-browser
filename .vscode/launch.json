@@ -26,12 +26,11 @@
         "pkg",
         "--",
         "--pkg-target=node16-win-x64",
-      ],
-      "runtimeExecutable": "npm",
-      "args": [
         "http://youtube.com/",
         "./youtube.exe"
-      ]
+      ],
+      "runtimeExecutable": "npm",
+      "args": []
     },
     {
       "type": "pwa-node",
@@ -46,12 +45,11 @@
         "--",
         "--pkg-target=node16-win-x64",
         "--browser-executable-path=C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
-      ],
-      "runtimeExecutable": "npm",
-      "args": [
         "http://youtube.com/",
         "./youtube.exe"
-      ]
+      ],
+      "runtimeExecutable": "npm",
+      "args": []
     }
   ]
 }

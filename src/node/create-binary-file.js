@@ -1,6 +1,6 @@
 import { exec } from 'pkg';
 
-import { writeFile, unlink, rm } from 'fs/promises';
+import { writeFile, unlink } from 'fs/promises';
 
 import { resolve } from 'path';
 
@@ -11,16 +11,12 @@ import createJsBundleFile from './create-js-bundle-file';
 
 import readFile from './read-file';
 import generateId from '../utils/generate-id';
-import downloadBrowser from './download-browser';
-import awaitSafely from '../utils/await-safely';
 
 const createBinaryFile = async (binaryFileArch, binaryFilePath, options) => {
   const {
     scripts: scriptsPaths,
 
     styles: stylesPaths,
-
-    executablePath: executablePathOpt,
   } = options || {};
 
   const runtimeId = generateId();
@@ -29,21 +25,13 @@ const createBinaryFile = async (binaryFileArch, binaryFilePath, options) => {
 
   const runtimeFilePath = resolve('.', runtimeFileName);
 
-  const localBrowserFolderName = `local-browser-${runtimeId}`;
-
-  const localBrowserFolderPath = resolve('.', localBrowserFolderName);
-
   const [
-    executablePath = '',
-
     mainScript = '',
 
     scripts = '',
 
     styles = '',
   ] = await Promise.all([
-    executablePathOpt || downloadBrowser(localBrowserFolderPath),
-
     createJsBundleFile(
       {
         input: resolve('./src/node/launch-browser.js'),
@@ -56,12 +44,13 @@ const createBinaryFile = async (binaryFileArch, binaryFilePath, options) => {
           'puppeteer-core',
 
           'path',
+
+          'fs/promises',
         ],
       },
 
       {
         exports: 'default',
-        name: 'launchBrowser',
         format: 'cjs',
       },
     ),
@@ -80,14 +69,6 @@ const createBinaryFile = async (binaryFileArch, binaryFilePath, options) => {
 
     `${mainScript}\n\nlaunchBrowser(${JSON.stringify({
       ...options,
-
-      isLocalBrowser: !executablePathOpt,
-
-      localBrowserFolderName,
-
-      localBrowserFolderPath,
-
-      executablePath,
 
       scripts,
 
@@ -113,13 +94,7 @@ const createBinaryFile = async (binaryFileArch, binaryFilePath, options) => {
     binaryFilePath,
   ]);
 
-  await awaitSafely(Promise.all([
-    unlink(runtimeFilePath),
-
-    rm(localBrowserFolderPath, {
-      recursive: true,
-    }),
-  ]));
+  await unlink(runtimeFilePath);
 };
 
 export default createBinaryFile;
