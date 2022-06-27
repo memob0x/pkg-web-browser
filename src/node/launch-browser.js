@@ -171,6 +171,8 @@ const launchBrowser = async (options) => {
 
     downloadHost,
 
+    downloadPath,
+
     binaryFileArch,
 
     revision,
@@ -195,7 +197,7 @@ const launchBrowser = async (options) => {
       executablePath: await getBrowserExecutablePath(
         executablePath,
 
-        join(process.cwd(), '.pkg-web-browser'),
+        downloadPath || join(process.cwd(), '.pkg-web-browser'),
 
         downloadHost,
 

@@ -21,25 +21,19 @@ pkg-web-browser http://website.org /path/to/the/executable-website
 In order to build for another architecture:
 
 ```sh
-pkg-web-browser --pkg-target=node16-win-x64 "http://website.org" "C:\\website.exe"
+pkg-web-browser --pkg-target=node16-win-x64 http://website.org website-binary.exe
 ```
 
 In order to use an existent browser ( makes the download process to be skipped):
 
 ```sh
-pkg-web-browser --browser-executable-path="/path/to/browser/executable" "http://website.org" "C:\\website.exe"
+pkg-web-browser --browser-executable-path=/path/to/browser/executable http://website.org website-binary
 ```
 
 In order to use an existent user profile data (such as saved passwords or websites preferences):
 
 ```sh
-pkg-web-browser --browser-user-data-dir="/path/to/browser/profiles/directory" "http://website.org" "C:\\website.exe"
-```
-
-In order to use an existent user profile data (such as saved passwords or websites preferences):
-
-```sh
-pkg-web-browser --browser-user-data-dir="/path/to/browser/profiles/directory" "http://website.org" "C:\\website.exe"
+pkg-web-browser --browser-user-data-dir=/path/to/browser/profiles/directory http://website.org website-binary
 ```
 
 ## Options
@@ -55,6 +49,7 @@ pkg-web-browser [options]
     --browser-height                Defines the opened website height
     --browser-executable-path       Sets an existent browser executable path to be used during browser launch
     --browser-download-host         Sets the browser executable download host to be used during download
+    --browser-download-path         The place where the download browser is stored
     --browser-revision              Sets the browser revision download host to be used during download
     --browser-product               Defines the type of browser: "chrome" or "firefox"
     --browser-args                  An arg to pass puppeteer args

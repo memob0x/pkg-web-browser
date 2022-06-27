@@ -41,6 +41,12 @@ const { options, targets } = option([
     example: "'pkg-browser --browser-download-host=https://foo.bar/path/to/official/browser/repo'",
   },
   {
+    name: 'browser-download-path',
+    type: 'string',
+    description: ' ',
+    example: "'pkg-browser --browser-download-path=/path/to/the/browser/downloads'",
+  },
+  {
     name: 'browser-revision',
     type: 'string',
     description: ' ',
@@ -97,6 +103,8 @@ const {
 
   'browser-download-host': downloadHost,
 
+  'browser-download-path': downloadPath,
+
   'browser-revision': revision,
 
   'browser-args': args = [],
@@ -143,6 +151,8 @@ createBinaryFile(
     product,
 
     downloadHost,
+
+    downloadPath,
 
     revision,
 
