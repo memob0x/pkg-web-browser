@@ -18,16 +18,28 @@ Build your first website package for the current host.
 pkg-web-browser http://website.org /path/to/the/executable-website
 ```
 
-In order to build for another architecture, a path to the browser executable is needed.
+In order to build for another architecture:
 
 ```sh
-pkg-web-browser --pkg-target=node16-win-x64 --browser-exeuctable-path="C:\\Program Files\\Mozilla Firefox\\firefox.exe" "http://website.org" "C:\\website.exe"
+pkg-web-browser --pkg-target=node16-win-x64 "http://website.org" "C:\\website.exe"
 ```
 
-In order to inherit an existent user profile data (such as saved passwords or websites preferences) the path to that existent profile is needed.
+In order to use an existent browser ( makes the download process to be skipped):
 
 ```sh
-pkg-web-browser --pkg-target=node16-win-x64 --browser-exeuctable-path="C:\\Program Files\\Mozilla Firefox\\firefox.exe" --browser-user-data-dir="C:\\Users\\danie\\AppData\\Local\\Mozilla\\Firefox\\Profiles\\YourProfile" "http://website.org" "C:\\website.exe"
+pkg-web-browser --browser-executable-path="/path/to/browser/executable" "http://website.org" "C:\\website.exe"
+```
+
+In order to use an existent user profile data (such as saved passwords or websites preferences):
+
+```sh
+pkg-web-browser --browser-user-data-dir="/path/to/browser/profiles/directory" "http://website.org" "C:\\website.exe"
+```
+
+In order to use an existent user profile data (such as saved passwords or websites preferences):
+
+```sh
+pkg-web-browser --browser-user-data-dir="/path/to/browser/profiles/directory" "http://website.org" "C:\\website.exe"
 ```
 
 ## Options
@@ -38,11 +50,13 @@ pkg-web-browser [options]
 
     -h, --help                      Outputs usage information
     --pkg-target                    Defines the program architecture
-    --browser-executable-path       Defines the used browser executable path
     --browser-user-data-dir         Defines the used browser profile directory path
     --browser-width                 Defines the opened website width
     --browser-height                Defines the opened website height
-    --browser-product               Defines the type of browser, "chrome", "firefox" ...
+    --browser-executable-path       Sets an existent browser executable path to be used during browser launch
+    --browser-download-host         Sets the browser executable download host to be used during download
+    --browser-revision              Sets the browser revision download host to be used during download
+    --browser-product               Defines the type of browser: "chrome" or "firefox"
     --browser-args                  An arg to pass puppeteer args
     --browser-ignore-default-args   An arg to tell puppeteer to ignore some of its own default args               
     --custom-styles                 Passes custom styles to be injected in browser (multiple files shall be comma separated)
