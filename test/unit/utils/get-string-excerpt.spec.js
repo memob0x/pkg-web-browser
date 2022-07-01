@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import getStringExcerpt from '../../src/utils/get-string-excerpt';
+import getStringExcerpt from '../../../src/utils/get-string-excerpt';
 
 describe('src/utils/get-string-excerpt', () => {
   it('should be able to truncate long strings (with default max chars)', () => {

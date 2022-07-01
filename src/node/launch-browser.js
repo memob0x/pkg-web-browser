@@ -2,7 +2,7 @@ import puppeteer from 'puppeteer-core';
 import { join } from 'path';
 
 import awaitSafely from '../utils/await-safely';
-import callWithRetry from '../utils/call-with-retry';
+import callAndAwaitWithRetry from '../utils/async-call-with-retry';
 import getStringExcerpt from '../utils/get-string-excerpt';
 import disallowNewPages from '../browser/disallow-new-pages';
 import awaitWithTimeout from '../utils/await-with-timeout';
@@ -21,11 +21,12 @@ const executeBrowserProcessLoopIteration = async (browser, mainPage, options) =>
   }
 
   const { focus, styles, scripts } = options || {};
+
   try {
     await log('log', 'polling iteration started');
 
     const pages = await awaitSafely(
-      callWithRetry(
+      callAndAwaitWithRetry(
         awaitWithTimeout.bind(
           null,
 

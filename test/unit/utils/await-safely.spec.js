@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import awaitSafely from '../../src/utils/await-safely';
+import awaitSafely from '../../../src/utils/await-safely';
 
 chai.use(chaiAsPromised);
 
@@ -13,6 +13,6 @@ describe('src/utils/await-safely', () => {
 
     expect(rejection).to.be.rejected;
 
-    expect(awaitSafely(rejection, 'default-value')).to.eventually.equal('default-value');
+    expect(awaitSafely(rejection, 'default-value')).to.not.be.rejected.eventually.equal('default-value');
   });
 });

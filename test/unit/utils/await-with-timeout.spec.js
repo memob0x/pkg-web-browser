@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import awaitWithTimeout from '../../src/utils/await-with-timeout';
+import awaitWithTimeout from '../../../src/utils/await-with-timeout';
 
 chai.use(chaiAsPromised);
 
@@ -15,7 +15,7 @@ describe('src/utils/await-with-timeout', () => {
       }, 1000);
     });
 
-    expect(awaitWithTimeout(longTask(), 1000)).to.eventually.equal('ok');
+    expect(awaitWithTimeout(longTask(), 1000)).to.not.be.rejected.and.eventually.equal('ok');
 
     expect(awaitWithTimeout(longTask(), 1001)).to.be.rejected;
   });

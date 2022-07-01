@@ -1,7 +1,7 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { JSDOM } from 'jsdom';
-import disallowNewPages from '../../src/browser/disallow-new-pages';
+import disallowNewPages from '../../../src/browser/disallow-new-pages';
 
 chai.use(chaiAsPromised);
 
@@ -25,12 +25,12 @@ describe('src/browser/disallow-new-pages', () => {
   it('should be able to remove all "target" attributes from all anchor elements in page', () => {
     const { window } = new JSDOM(
       `<html>
-       <body>
-        <a href="#">stay here</a>
-        <a href="#" target="_blank">take me wawait</a>
-        <a href="#" target="_self">stay here too</a>
-       </body>
-     </html>`,
+        <body>
+          <a href="#">stay here</a>
+          <a href="#" target="_blank">take me wawait</a>
+          <a href="#" target="_self">stay here too</a>
+        </body>
+      </html>`,
       { url: 'http://localhost' },
     );
 

@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import generateId from '../../src/utils/generate-id';
+import generateId from '../../../src/utils/generate-id';
 
 describe('src/utils/generate-id', async () => {
   it('should be able to await a promise safely, handling rejection with a default value', () => {
