@@ -10,7 +10,7 @@
   "scripts": {
     "build": "node --experimental-specifier-resolution=node ./build.js",
     "pkg": "npm run build && node ./dist/index.cjs",
-    "test:unit": "./node_modules/.bin/mocha --experimental-specifier-resolution=node ./src/**/*.test.js",
+    "test:unit": "./node_modules/.bin/mocha --experimental-specifier-resolution=node ./test/**/*.spec.js",
     "test": "npm run test:unit",
     "lint": "./node_modules/.bin/eslint --ext .js . --fix",
     "prepare": "husky install"
@@ -48,7 +48,11 @@
     "husky": "^8.0.1",
     "mocha": "^10.0.0",
     "pkg": "^5.7.0",
-    "puppeteer-core": "^15.1.1",
+    "puppeteer-core": "^15.2.0",
     "rollup": "^2.75.7"
+  },
+  "devDependencies": {
+    "chai-as-promised": "^7.1.1",
+    "jsdom": "^20.0.0"
   }
 }

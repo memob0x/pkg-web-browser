@@ -1,3 +1,3 @@
-const generateId = () => `${Date.now()}${Math.random()}`;
+const generateId = () => `${Date.now()}${Math.random()}`.replace('.', '');
 
 export default generateId;

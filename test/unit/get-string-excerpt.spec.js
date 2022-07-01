@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import getStringExcerpt from './get-string-excerpt';
+import getStringExcerpt from '../../src/utils/get-string-excerpt';
 
-describe('get-string-excerpt', () => {
+describe('src/utils/get-string-excerpt', () => {
   it('should be able to truncate long strings (with default max chars)', () => {
     const string = '123456789123456789123456789123456789123456789123456789';
 
