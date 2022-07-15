@@ -1,11 +1,11 @@
 {
-  "name": "pkg-website",
-  "version": "0.0.1",
+  "name": "pkg-web-browser",
+  "version": "1.2.0",
   "type": "module",
-  "description": "Reduce a website to an executable file",
+  "description": "Bundle a browser and a website into an executable file",
   "main": "dist/index.cjs",
   "bin": {
-    "pkg-website": "dist/index.cjs"
+    "pkg-web-browser": "dist/index.cjs"
   },
   "scripts": {
     "build": "node --experimental-specifier-resolution=node ./build.js",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "github.com/memob0x/pkg-website"
+    "url": "github.com/memob0x/pkg-web-browser"
   },
   "keywords": [
     "browser",
@@ -41,17 +41,15 @@
     "@rollup/plugin-node-resolve": "^13.3.0",
     "argv": "^0.0.2",
     "chai": "^4.3.6",
-    "eslint": "^8.18.0",
+    "eslint": "^8.19.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsdoc": "^39.3.3",
     "husky": "^8.0.1",
     "mocha": "^10.0.0",
-    "pkg": "^5.7.0",
-    "puppeteer-core": "^15.2.0",
-    "rollup": "^2.75.7"
-  },
-  "devDependencies": {
+    "pkg": "^5.8.0",
+    "puppeteer-core": "^15.4.0",
+    "rollup": "^2.77.0",
     "chai-as-promised": "^7.1.1",
     "jsdom": "^20.0.0"
   }
