@@ -5,7 +5,7 @@
   "description": "Bundle a browser and a website into an executable file",
   "main": "dist/index.cjs",
   "bin": {
-    "pkg-web-browser": "dist/index.cjs"
+    "pkg-web-browser": "bin/index.cjs"
   },
   "scripts": {
     "build": "node --experimental-specifier-resolution=node ./build.js",

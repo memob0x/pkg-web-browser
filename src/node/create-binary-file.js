@@ -23,7 +23,8 @@ const createBinaryFile = async (binaryFileArch, binaryFilePath, options) => {
 
   const runtimeFileName = `runtime-${runtimeId}.js`;
 
-  const runtimeFilePath = resolve('.', runtimeFileName);
+  // NOTE: must be relative to {workspaceFolder}/dist folder
+  const runtimeFilePath = resolve(__dirname, '..', runtimeFileName);
 
   const [
     mainScript = '',
@@ -34,7 +35,8 @@ const createBinaryFile = async (binaryFileArch, binaryFilePath, options) => {
   ] = await Promise.all([
     createJsBundleFile(
       {
-        input: resolve('./src/node/launch-browser.js'),
+        // NOTE: must be relative to {workspaceFolder}/dist folder
+        input: resolve(__dirname, '../src/node/launch-browser.js'),
 
         plugins: [
           commonjs(),
@@ -77,12 +79,14 @@ const createBinaryFile = async (binaryFileArch, binaryFilePath, options) => {
   );
 
   await exec([
-    `./${runtimeFileName}`,
+    // NOTE: must be relative to {workspaceFolder}/dist folder
+    resolve(__dirname, `../${runtimeFileName}`),
 
     '--debug',
 
     '--config',
-    './pkg.json',
+    // NOTE: must be relative to {workspaceFolder}/dist folder
+    resolve(__dirname, '../pkg.json'),
 
     '--compress',
     'GZip',

@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
       "name": "Build library",
       "skipFiles": [
@@ -15,7 +15,7 @@
       ]
     },
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
       "name": "Build win binary with bundled browser",
       "skipFiles": [
@@ -33,7 +33,7 @@
       "args": []
     },
     {
-      "type": "pwa-node",
+      "type": "node",
       "request": "launch",
       "name": "Build win binary with external browser",
       "skipFiles": [
