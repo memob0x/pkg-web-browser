@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer-core';
 import { join } from 'path';
+import { mkdir } from 'fs/promises';
 
 import awaitSafely from '../utils/await-safely';
 import callAndAwaitWithRetry from '../utils/async-call-with-retry';
@@ -184,6 +185,10 @@ const launchBrowser = async (options) => {
   await log('log', `ignored args: ${ignoreDefaultArgs}`);
 
   await log('log', 'launching browser');
+
+  if (userDataDir) {
+    await awaitSafely(mkdir(userDataDir));
+  }
 
   const browser = await awaitWithTimeout(
     puppeteer.launch({
