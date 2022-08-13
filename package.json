@@ -1,6 +1,6 @@
 {
   "name": "pkg-web-browser",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "type": "module",
   "description": "Bundle a browser and a website into an executable file",
   "main": "dist/index.cjs",
