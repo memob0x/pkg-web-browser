@@ -117,7 +117,7 @@ const executeBrowserProcessLoopIteration = async (browser, mainPage, options) =>
     }
 
     if (focus && extraPagesCount) {
-      await log('log', async () => `focus mode: page "${getStringExcerpt(await awaitSafely(mainPage.title()))}" taken to front`);
+      await log('log', async () => `focus mode: page "${getStringExcerpt(await awaitSafely(mainPage.title(), ''))}" taken to front`);
 
       tasks.push(
         awaitSafely(awaitWithTimeout(mainPage.bringToFront())),
