@@ -72,34 +72,61 @@ const [
   binaryFilePath = '.',
 ] = buildCliTargets || [];
 
+const createProjectFileRollup = (input) => createRollup(
+  {
+    input,
+
+    plugins: [
+      commonjs(),
+    ],
+
+    external: [
+      'puppeteer-core',
+
+      'path',
+
+      'fs/promises',
+    ],
+  },
+
+  {
+    exports: 'default',
+    format: 'cjs',
+  },
+);
+
 (async () => {
-  let pkgEnvDynamicallyGeneratedCommandString = await createRollup(
-    {
-      input: resolve(
-        // NOTE: this very project "dist" folder path
-        __dirname,
+  let pkgEnvDynamicallyGeneratedCommandString = await createProjectFileRollup(
+    resolve(
+      // NOTE: this very project "dist" folder path
+      __dirname,
 
-        '../src/launch-pkg-env-cli.js',
-      ),
-
-      plugins: [
-        commonjs(),
-      ],
-
-      external: [
-        'puppeteer-core',
-
-        'path',
-
-        'fs/promises',
-      ],
-    },
-
-    {
-      exports: 'default',
-      format: 'cjs',
-    },
+      '../src/launch-pkg-env-cli.js',
+    ),
   );
+
+  pkgEnvDynamicallyGeneratedCommandString += await createProjectFileRollup(
+    resolve(
+      // NOTE: this very project "dist" folder path
+      __dirname,
+
+      '../src/launch-pkg-env-browser.js',
+    ),
+  );
+
+  pkgEnvDynamicallyGeneratedCommandString += '(async () => {';
+
+  pkgEnvDynamicallyGeneratedCommandString += `const {
+    executablePath: executablePathCli,
+
+    userDataDir: userDataDirCli,
+  } = await launchPkgEnvCli(
+    "${puppeteerBrowserProduct}",
+
+    "${getPuppeteerBrowserPlatform(pkgOutputFileArchitecture)}",
+
+    "${puppeteerBrowserRevision}",
+  );`;
 
   const instanceId = generateId();
 
@@ -121,10 +148,8 @@ const [
       basename(pkgAppEntrypointFile),
     );
 
-    pkgEnvDynamicallyGeneratedCommandString = `
+    pkgEnvDynamicallyGeneratedCommandString += `
       require("./${basename(dynamicallyGeneratedPkgEntrypointFilePath)}");
-      
-      ${pkgEnvDynamicallyGeneratedCommandString}
     `;
   }
 
@@ -140,25 +165,25 @@ const [
     `${instanceId}.json`,
   );
 
-  const pkgEnvCliOptions = {
-    product: puppeteerBrowserProduct,
+  pkgEnvDynamicallyGeneratedCommandString += `
+    // TODO: kill the whole app on browser exit
 
-    platform: getPuppeteerBrowserPlatform(pkgOutputFileArchitecture),
+    await launchPkgEnvBrowser(
+      "${url}",
 
-    revision: puppeteerBrowserRevision,
+      executablePathCli,
 
-    args: puppeteerBrowserArgs,
+      userDataDirCli,
 
-    ignoreDefaultArgs: puppeteerBrowserIgnoreDefaultArgs,
-  };
+      "${puppeteerBrowserProduct}",
 
-  pkgEnvDynamicallyGeneratedCommandString = `${pkgEnvDynamicallyGeneratedCommandString}
+      ${JSON.stringify(puppeteerBrowserArgs)},
 
-  (async () => launchPkgEnvCli(
-   " ${url}",
-  
-    ${JSON.stringify(pkgEnvCliOptions)}
-  ))();`;
+      ${JSON.stringify(puppeteerBrowserIgnoreDefaultArgs)}
+    )
+  `;
+
+  pkgEnvDynamicallyGeneratedCommandString += '})();';
 
   await Promise.all([
     writeFile(

@@ -10,50 +10,97 @@ basically [Pkg](https://github.com/vercel/pkg) + [Puppeteeer](https://github.com
 
 ## Installation
 
-```sh
+```console
 npm install -g pkg-web-browser
 ```
-## Bundle a public website
 
-```sh
+## Recipees
+### Bundle a public website
+
+```console
 pkg-web-browser http://website.org /path/to/the/executable-website
 ```
 
-## Bundle a local node application
+### Bundle a local node application
 
-Move into the node application to be bundled and install [puppeteer-core](https://www.npmjs.com/package/puppeteer-core) package.
+Move into the node application to be bundled.
 
-```sh
+```console
 cd path/to/local/app
+```
+Install [puppeteer-core](https://www.npmjs.com/package/puppeteer-core) package.
 
+```console
 npm install --save-dev puppeteer-core
 ```
 
 Bundle the local application indicating its entrypoint (usally index.js) as "pkg-entrypoint" argument.
 
-```sh
+```console
 pkg-web-browser --pkg-entrypoint=index.js http://localhost:80 localhost-app
 ```
 
-## Prepare a bundle for another architecture
+### Prepare a bundle for another architecture
 
-See [vercel/pkg](https://github.com/vercel/pkg#targets) documentation in order to get the full architectures list.
-
-```sh
-pkg-web-browser --pkg-target=node16-win-x64 http://website.org website-binary.exe
-```
-
-## Options
-Run `pkg-web-browser --help` without arguments to see the list of options:
+See [Pkg](https://github.com/vercel/pkg#targets) documentation in order to get the full architectures list.
 
 ```console
-pkg-web-browser [options]
+pkg-web-browser --pkg-target=node16-win-x64 http://website.org website-binary.exe
+```
+## Documentation
 
-    -h, --help                      Outputs usage information
-    --pkg-target                    Defines the program architecture
-    --pkg-entrypoint                Defines the pkg cli only target (eg. "pkg app.js"), the target application entrypoint (you need to install puppeteer-core in the entrypoint project)
-    --browser-revision              Sets the browser revision download host to be used during download
-    --browser-product               Defines the type of browser: "chrome" or "firefox"
-    --browser-args                  An arg to pass puppeteer args
-    --browser-ignore-default-args   An arg to tell puppeteer to ignore some of its own default args               
- ```
+The first two arguments without `--` or `-` prefixes are mandatory. The first indicates the url to be navigated while the second the output file path.
+
+```console
+pkg-web-browser http://website.com website-app                   
+```
+
+To see the list of options:
+
+```console
+pkg-web-browser --help                      
+```
+
+To define the program architecture ([full list](https://github.com/vercel/pkg#targets)):
+
+```console
+pkg-web-browser --pkg-target=node16-win-x64
+```
+
+To define the optional program local entrypoint ([dedicated documentation](https://github.com/vercel/pkg#usage)):
+
+```console
+pkg-web-browser --pkg-entrypoint=app.js
+```
+
+To define the type of browser:
+
+```console
+pkg-web-browser --browser-product=chrome
+```
+
+```console
+pkg-web-browser --browser-product=firefox
+```
+
+To set the browser build revision:
+
+```console
+pkg-web-browser --browser-revision=1018312
+```
+
+```console
+pkg-web-browser --browser-revision=98.0a1
+```
+
+To define the browser arguments:
+
+```console
+pkg-web-browser --browser-args=--kiosk
+```
+
+To ignore some of the default browser args:
+
+```console
+pkg-web-browser --browser-ignore-default-args=--enable-automation
+```
