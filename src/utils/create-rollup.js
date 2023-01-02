@@ -1,6 +1,6 @@
 import { rollup } from 'rollup';
 
-const createJsBundleFile = async (inputOptions, outputOptions) => {
+const createRollup = async (inputOptions, outputOptions) => {
   const input = await rollup(inputOptions);
 
   const { output } = await input.generate(outputOptions);
@@ -12,4 +12,4 @@ const createJsBundleFile = async (inputOptions, outputOptions) => {
   return code || '';
 };
 
-export default createJsBundleFile;
+export default createRollup;

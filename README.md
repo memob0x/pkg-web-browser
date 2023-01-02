@@ -38,6 +38,12 @@ In order to use an existent user profile data (such as saved passwords or websit
 pkg-web-browser --browser-user-data-dir=/path/to/browser/profiles/directory http://website.org website-binary
 ```
 
+```sh
+npm install --save-dev puppeteer-core
+
+pkg-web-browser --pkg-entrypoint=./path/to/app.js http://localhost.3000 localhostapp
+```
+
 ## Options
 Run `pkg-web-browser --help` without arguments to see the list of options:
 
@@ -46,17 +52,11 @@ pkg-web-browser [options]
 
     -h, --help                      Outputs usage information
     --pkg-target                    Defines the program architecture
-    --browser-user-data-dir         Defines the used browser profile directory path
+    --pkg-entrypoint                Defines the pkg cli only target (eg. "pkg app.js"), the target application entrypoint (you need to install puppeteer-core in the entrypoint project)
     --browser-width                 Defines the opened website width
     --browser-height                Defines the opened website height
-    --browser-executable-path       Sets an existent browser executable path to be used during browser launch
-    --browser-download-host         Sets the browser executable download host to be used during download
-    --browser-download-path         The place where the download browser is stored
     --browser-revision              Sets the browser revision download host to be used during download
     --browser-product               Defines the type of browser: "chrome" or "firefox"
     --browser-args                  An arg to pass puppeteer args
     --browser-ignore-default-args   An arg to tell puppeteer to ignore some of its own default args               
-    --custom-styles                 Passes custom styles to be injected in browser (multiple files shall be comma separated)
-    --custom-scripts                Passes custom scripts to be injected in browser (multiple files shall be comma separated)
-    --focus                         Tells the program to do its best to keep link navigation in the main window and to kill popups
  ```
