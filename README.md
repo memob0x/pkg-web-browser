@@ -4,44 +4,43 @@
 [![scroll-padlock (latest)](https://img.shields.io/npm/v/pkg-web-browser/latest.svg)](https://www.npmjs.com/package/pkg-web-browser)
 [![scroll-padlock (downloads)](https://img.shields.io/npm/dy/pkg-web-browser.svg)](https://www.npmjs.com/package/pkg-web-browser)
 
-Reduce a website to an executable, basically [Pkg](https://github.com/vercel/pkg) + [Puppeteeer](https://github.com/puppeteer/puppeteer) with some extra features.
+Bundle a public website or a local web application to an executable and browse it through a web browser;
 
-## Usage
+basically [Pkg](https://github.com/vercel/pkg) + [Puppeteeer](https://github.com/puppeteer/puppeteer).
 
-Install the npm module globally.
+## Installation
 
 ```sh
 npm install -g pkg-web-browser
 ```
-
-Build your first website package for the current host.
+## Bundle a public website
 
 ```sh
 pkg-web-browser http://website.org /path/to/the/executable-website
 ```
 
-In order to build for another architecture:
+## Bundle a local node application
+
+Move into the node application to be bundled and install [puppeteer-core](https://www.npmjs.com/package/puppeteer-core) package.
+
+```sh
+cd path/to/local/app
+
+npm install --save-dev puppeteer-core
+```
+
+Bundle the local application indicating its entrypoint (usally index.js) as "pkg-entrypoint" argument.
+
+```sh
+pkg-web-browser --pkg-entrypoint=index.js http://localhost:80 localhost-app
+```
+
+## Prepare a bundle for another architecture
+
+See [vercel/pkg](https://github.com/vercel/pkg#targets) documentation in order to get the full architectures list.
 
 ```sh
 pkg-web-browser --pkg-target=node16-win-x64 http://website.org website-binary.exe
-```
-
-In order to use an existent browser ( makes the download process to be skipped):
-
-```sh
-pkg-web-browser --browser-executable-path=/path/to/browser/executable http://website.org website-binary
-```
-
-In order to use an existent user profile data (such as saved passwords or websites preferences):
-
-```sh
-pkg-web-browser --browser-user-data-dir=/path/to/browser/profiles/directory http://website.org website-binary
-```
-
-```sh
-npm install --save-dev puppeteer-core
-
-pkg-web-browser --pkg-entrypoint=./path/to/app.js http://localhost.3000 localhostapp
 ```
 
 ## Options
@@ -53,8 +52,6 @@ pkg-web-browser [options]
     -h, --help                      Outputs usage information
     --pkg-target                    Defines the program architecture
     --pkg-entrypoint                Defines the pkg cli only target (eg. "pkg app.js"), the target application entrypoint (you need to install puppeteer-core in the entrypoint project)
-    --browser-width                 Defines the opened website width
-    --browser-height                Defines the opened website height
     --browser-revision              Sets the browser revision download host to be used during download
     --browser-product               Defines the type of browser: "chrome" or "firefox"
     --browser-args                  An arg to pass puppeteer args

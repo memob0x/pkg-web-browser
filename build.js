@@ -3,12 +3,22 @@ import { mkdir, writeFile } from 'fs/promises';
 import commonjs from '@rollup/plugin-commonjs';
 import createRollup from './src/utils/create-rollup';
 
-const createBuildRollup = async (inputPath, outputPath) => writeFile(
-  outputPath,
+const outputPath = resolve('./dist');
+
+try {
+  await mkdir(outputPath);
+} catch (error) {
+  if (error.code !== 'EEXIST') {
+    throw error;
+  }
+}
+
+await writeFile(
+  `${outputPath}/index.cjs`,
 
   await createRollup(
     {
-      input: inputPath,
+      input: resolve('./src/index.js'),
 
       plugins: [
         commonjs(),
@@ -35,20 +45,4 @@ const createBuildRollup = async (inputPath, outputPath) => writeFile(
       format: 'cjs',
     },
   ),
-);
-
-const outputPath = resolve('./dist');
-
-try {
-  await mkdir(outputPath);
-} catch (error) {
-  if (error.code !== 'EEXIST') {
-    throw error;
-  }
-}
-
-await createBuildRollup(
-  resolve('./src/index.js'),
-
-  `${outputPath}/index.cjs`,
 );
