@@ -6,6 +6,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import createRollup from './utils/create-rollup';
 import generateId from './utils/generate-id';
 import getPuppeteerBrowserPlatform from './utils/get-puppeteer-browser-platform';
+import { STRING_EXECUTED_FILE_WORKING_DIR_PATH } from './constants';
 
 const { option: parseBuildCliArgs } = argv;
 
@@ -14,6 +15,18 @@ const {
 
   targets: buildCliTargets,
 } = parseBuildCliArgs([
+  {
+    name: 'browser-executable-path',
+    type: 'string',
+    description: ' ',
+    example: "'pkg-web-browser --browser-executable-path=/path/to/chromium'",
+  },
+  {
+    name: 'browser-user-data-dir',
+    type: 'string',
+    description: ' ',
+    example: "'pkg-web-browser --browser-user-data-dir=/path/to/browser/user/data'",
+  },
   {
     name: 'browser-product',
     type: 'string',
@@ -53,9 +66,13 @@ const {
 ]).run();
 
 const {
-  'browser-product': puppeteerBrowserProduct = 'chrome',
+  'browser-executable-path': puppeteerBrowserExecutablePath,
 
-  'browser-revision': puppeteerBrowserRevision = '1018312',
+  'browser-user-data-dir': puppeteerBrowserUserDataDir = '',
+
+  'browser-product': puppeteerBrowserProduct,
+
+  'browser-revision': puppeteerBrowserRevision,
 
   'browser-args': puppeteerBrowserArgs = [],
 
@@ -65,6 +82,22 @@ const {
 
   'pkg-entrypoint': pkgAppEntrypointFile = '',
 } = buildCliArgs || {};
+
+let puppeteerBrowserProductClean = puppeteerBrowserProduct;
+
+if (puppeteerBrowserProduct !== 'chrome' || puppeteerBrowserProduct !== 'firefox') {
+  puppeteerBrowserProductClean = 'chrome';
+}
+
+let puppeteerBrowserRevisionClean = puppeteerBrowserRevision;
+
+if (puppeteerBrowserProductClean === 'chrome' && !puppeteerBrowserRevisionClean) {
+  puppeteerBrowserRevisionClean = '1018312';
+}
+
+if (puppeteerBrowserProductClean === 'firefox' && !puppeteerBrowserRevisionClean) {
+  puppeteerBrowserRevisionClean = '98.0a1';
+}
 
 const [
   url = 'https://localhost:80',
@@ -76,10 +109,10 @@ const [
   let pkgEnvDynamicallyGeneratedCommandString = await createRollup(
     {
       input: resolve(
-        // NOTE: this very project "dist" folder path
-        __dirname,
 
-        '../src/cli.js',
+        STRING_EXECUTED_FILE_WORKING_DIR_PATH,
+
+        '../src/lib.js',
       ),
 
       plugins: [
@@ -102,33 +135,26 @@ const [
   );
 
   pkgEnvDynamicallyGeneratedCommandString += `
-    const readlineInterface = require('readline').createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-
     (async () => {
   `;
 
-  pkgEnvDynamicallyGeneratedCommandString += `const {
-    executablePath: executablePathCli,
-
-    userDataDir: userDataDirCli,
-  } = await launchUserPreferencesCli(
-    readlineInterface,
-
-    "${puppeteerBrowserProduct}",
-
-    "${getPuppeteerBrowserPlatform(pkgOutputFileArchitecture)}",
-
-    "${puppeteerBrowserRevision}",
-  );`;
-
   const instanceId = generateId();
 
+  pkgEnvDynamicallyGeneratedCommandString += `
+    const executablePath = await getPuppeteerBrowserExecutablePath(
+      "${puppeteerBrowserProductClean}",
+
+      "${getPuppeteerBrowserPlatform(pkgOutputFileArchitecture)}",
+
+      "${puppeteerBrowserRevisionClean}",
+
+      "${puppeteerBrowserExecutablePath}",
+    );
+  `;
+
   let dynamicallyGeneratedPkgEntrypointFilePath = resolve(
-    // NOTE: this very project "dist" folder path
-    __dirname,
+
+    STRING_EXECUTED_FILE_WORKING_DIR_PATH,
 
     '..',
 
@@ -162,21 +188,31 @@ const [
   );
 
   pkgEnvDynamicallyGeneratedCommandString += `
-    const browser = await launchBrowser(
-      "${url}",
+    const haltApplication = () => process.exit();
 
-      executablePathCli,
+    try {
+      const browser = await launchPuppeteerBrowser(
+        "${url}",
 
-      userDataDirCli,
+        executablePath,
 
-      "${puppeteerBrowserProduct}",
+        "${puppeteerBrowserUserDataDir}",
 
-      ${JSON.stringify(puppeteerBrowserArgs)},
+        "${puppeteerBrowserProductClean}",
 
-      ${JSON.stringify(puppeteerBrowserIgnoreDefaultArgs)}
-    );
+        ${JSON.stringify(puppeteerBrowserArgs)},
 
-    browser.on('disconnected', () => process.exit());
+        ${JSON.stringify(puppeteerBrowserIgnoreDefaultArgs)}
+      );
+
+      browser.on('disconnected', haltApplication);
+    }catch(e){
+      console.warn("The following error was thrown during browser launch, please close any other browser instance and try again.");
+      
+      console.error(e);
+
+      haltApplication();
+    }
   `;
 
   pkgEnvDynamicallyGeneratedCommandString += '})();';

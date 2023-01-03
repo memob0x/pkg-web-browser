@@ -6,7 +6,7 @@ import createRollup from './src/utils/create-rollup';
 const outputPath = resolve('./dist');
 
 try {
-  await mkdir(outputPath);
+  await mkdir(outputPath, { recursive: true });
 } catch (error) {
   if (error.code !== 'EEXIST') {
     throw error;

@@ -3,35 +3,29 @@ import findFile from './find-file';
 const isBrowserExecutableFile = (
   { stats, path, name },
 
-  product,
-
-  platform,
-
-  revision,
+  { product, platform, revision },
 ) => {
-  if (stats.isDirectory()) {
+  if (stats?.isDirectory()) {
     return false;
   }
 
-  if (!path.includes(revision)) {
+  if (revision && !path.includes(revision)) {
     return false;
   }
 
-  if (platform.startsWith('win')) {
-    return name === `${product}.exe`;
-  }
+  let products = product ? [product] : ['chrome', 'firefox'];
 
-  return product === name;
+  const productsExes = products.map((x) => `${x}.exe`);
+
+  products = platform && platform.startsWith('win') ? productsExes : [...products, ...productsExes];
+
+  return products.includes(name);
 };
 
 const findPuppeteerBrowser = async (
   path,
 
-  product,
-
-  platform,
-
-  revision,
+  options,
 ) => {
   const [foundExecutableFile] = await findFile(
     path,
@@ -39,11 +33,7 @@ const findPuppeteerBrowser = async (
     (file) => isBrowserExecutableFile(
       file,
 
-      product,
-
-      platform,
-
-      revision,
+      options || {},
     ),
   );
 

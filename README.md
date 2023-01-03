@@ -47,12 +47,19 @@ See [Pkg](https://github.com/vercel/pkg#targets) documentation in order to get t
 ```console
 pkg-web-browser --pkg-target=node16-win-x64 http://website.org website-binary.exe
 ```
+
+### Prepare a windows bundle for an existent chrome
+
+```console
+pkg-web-browser --pkg-target=node16-win-x64 --browser-executable-path="C:\\\Program Files\\\Google\\\Chrome\\\Application\\\chrome.exe" --browser-user-data-dir="C:\\\Users\\\danie\\\AppData\\\Local\\\Google\\\Chrome\\\User Data" https://www.wikipedia.org/ wikipedia.exe
+```
+
 ## Documentation
 
 The first two arguments without `--` or `-` prefixes are mandatory. The first indicates the url to be navigated while the second the output file path.
 
 ```console
-pkg-web-browser http://website.com website-app                   
+pkg-web-browser https://www.wikipedia.org/ wikipedia-app                   
 ```
 
 To see the list of options:
@@ -71,6 +78,18 @@ To define the optional program local entrypoint ([dedicated documentation](https
 
 ```console
 pkg-web-browser --pkg-entrypoint=app.js
+```
+
+To define an existent browser executable path or future browser download folder:
+
+```console
+pkg-web-browser --browser-executable-path=/path/to/chromium
+```
+
+To define a browser [user-data directory](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/user_data_dir.md), existent or not:
+
+```console
+pkg-web-browser --browser-user-data-dir=/path/to/browser/user/data
 ```
 
 To define the type of browser:

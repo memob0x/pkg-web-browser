@@ -9,6 +9,8 @@ chai.use(chaiAsPromised);
 
 const { expect } = chai;
 
+const FS_MKDIR_OPTIONS = { recursive: true };
+
 const FS_RM_OPTIONS = { recursive: true, force: true };
 
 const clearTestBed = async () => rm('./foo', FS_RM_OPTIONS);
@@ -18,15 +20,11 @@ const findFilesPaths = async (...args) => (await findFile(...args)).map((x) => x
 const prepareTestBed = async () => {
   await clearTestBed();
 
-  await mkdir('./foo');
+  await mkdir('./foo/bar', FS_MKDIR_OPTIONS);
 
-  await mkdir('./foo/bar');
+  await mkdir('./foo/biz/bar', FS_MKDIR_OPTIONS);
 
-  await mkdir('./foo/biz');
-
-  await mkdir('./foo/biz/bar');
-
-  await mkdir('./foo/biz/zz');
+  await mkdir('./foo/biz/zz', FS_MKDIR_OPTIONS);
 
   await writeFile('./foo/biz/zz/1.txt', 'hello');
 };

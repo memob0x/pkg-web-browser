@@ -44,7 +44,9 @@ const getUniqueArray = (array, predicate) => array.filter(
   (c, i, self) => self.findIndex((y) => predicate(c, y)) === i,
 );
 
-const isDirectory = ({ stats }) => stats.isDirectory();
+const isStatsDirectory = (stats) => stats?.isDirectory();
+
+const isFileStatsDirectory = ({ stats }) => isStatsDirectory(stats);
 
 const areFilesEqual = (a, b) => a.path === b.path;
 
@@ -63,7 +65,7 @@ async function iterateFileFinder(path, predicate, accumulator) {
     ];
   }
 
-  const directoriesInPath = filesInPath.filter(isDirectory);
+  const directoriesInPath = filesInPath.filter(isFileStatsDirectory);
 
   if (!directoriesInPath.length) {
     return accumulatorCopy;
@@ -97,7 +99,7 @@ export default async function findFile(path, operand) {
     return [];
   }
 
-  if (!stats.isDirectory()) {
+  if (!isStatsDirectory(stats)) {
     pathClean = dirname(pathClean);
   }
 
