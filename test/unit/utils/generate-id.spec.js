@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import generateId from '../../../src/utils/generate-id';
 
 describe('src/utils/generate-id', async () => {
-  it('should be able to await a promise safely, handling rejection with a default value', () => {
+  it('should be able to generate unique ids', () => {
     const ids = [];
 
     for (let i = 0; i < 2500; i += 1) {

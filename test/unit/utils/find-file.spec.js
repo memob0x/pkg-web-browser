@@ -1,13 +1,8 @@
-import chai from 'chai';
+import { expect } from 'chai';
 import {
   mkdir, rm, writeFile,
 } from 'fs/promises';
-import chaiAsPromised from 'chai-as-promised';
 import findFile from '../../../src/utils/find-file';
-
-chai.use(chaiAsPromised);
-
-const { expect } = chai;
 
 const FS_MKDIR_OPTIONS = { recursive: true };
 

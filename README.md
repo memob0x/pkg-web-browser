@@ -1,8 +1,8 @@
 # pkg-web-browser
 
 ![Node.js CI](https://github.com/memob0x/pkg-web-browser/workflows/Node.js%20CI/badge.svg)
-[![scroll-padlock (latest)](https://img.shields.io/npm/v/pkg-web-browser/latest.svg)](https://www.npmjs.com/package/pkg-web-browser)
-[![scroll-padlock (downloads)](https://img.shields.io/npm/dy/pkg-web-browser.svg)](https://www.npmjs.com/package/pkg-web-browser)
+[![pkg-web-browser (latest)](https://img.shields.io/npm/v/pkg-web-browser/latest.svg)](https://www.npmjs.com/package/pkg-web-browser)
+[![pkg-web-browser (downloads)](https://img.shields.io/npm/dy/pkg-web-browser.svg)](https://www.npmjs.com/package/pkg-web-browser)
 
 Bundle a public website or a local web application to an executable and browse it through a web browser;
 
@@ -80,13 +80,13 @@ To define the optional program local entrypoint ([dedicated documentation](https
 pkg-web-browser --pkg-entrypoint=app.js
 ```
 
-To define an existent browser executable path or future browser download folder:
+To define an existent browser executable path:
 
 ```console
 pkg-web-browser --browser-executable-path=/path/to/chromium
 ```
 
-To define a browser [user-data directory](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/user_data_dir.md), existent or not:
+To define a browser [user-data directory](https://chromium.googlesource.com/chromium/src/+/refs/heads/main/docs/user_data_dir.md):
 
 ```console
 pkg-web-browser --browser-user-data-dir=/path/to/browser/user/data
