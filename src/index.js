@@ -72,55 +72,51 @@ const [
   binaryFilePath = '.',
 ] = buildCliTargets || [];
 
-const createProjectFileRollup = (input) => createRollup(
-  {
-    input,
-
-    plugins: [
-      commonjs(),
-    ],
-
-    external: [
-      'puppeteer-core',
-
-      'path',
-
-      'fs/promises',
-    ],
-  },
-
-  {
-    exports: 'default',
-    format: 'cjs',
-  },
-);
-
 (async () => {
-  let pkgEnvDynamicallyGeneratedCommandString = await createProjectFileRollup(
-    resolve(
-      // NOTE: this very project "dist" folder path
-      __dirname,
+  let pkgEnvDynamicallyGeneratedCommandString = await createRollup(
+    {
+      input: resolve(
+        // NOTE: this very project "dist" folder path
+        __dirname,
 
-      '../src/launch-pkg-env-cli.js',
-    ),
+        '../src/cli.js',
+      ),
+
+      plugins: [
+        commonjs(),
+      ],
+
+      external: [
+        'puppeteer-core',
+
+        'path',
+
+        'fs/promises',
+      ],
+    },
+
+    {
+      // exports: 'default',
+      format: 'cjs',
+    },
   );
 
-  pkgEnvDynamicallyGeneratedCommandString += await createProjectFileRollup(
-    resolve(
-      // NOTE: this very project "dist" folder path
-      __dirname,
+  pkgEnvDynamicallyGeneratedCommandString += `
+    const readlineInterface = require('readline').createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
 
-      '../src/launch-pkg-env-browser.js',
-    ),
-  );
-
-  pkgEnvDynamicallyGeneratedCommandString += '(async () => {';
+    (async () => {
+  `;
 
   pkgEnvDynamicallyGeneratedCommandString += `const {
     executablePath: executablePathCli,
 
     userDataDir: userDataDirCli,
-  } = await launchPkgEnvCli(
+  } = await launchUserPreferencesCli(
+    readlineInterface,
+
     "${puppeteerBrowserProduct}",
 
     "${getPuppeteerBrowserPlatform(pkgOutputFileArchitecture)}",
@@ -166,9 +162,7 @@ const createProjectFileRollup = (input) => createRollup(
   );
 
   pkgEnvDynamicallyGeneratedCommandString += `
-    // TODO: kill the whole app on browser exit
-
-    await launchPkgEnvBrowser(
+    const browser = await launchBrowser(
       "${url}",
 
       executablePathCli,
@@ -180,7 +174,9 @@ const createProjectFileRollup = (input) => createRollup(
       ${JSON.stringify(puppeteerBrowserArgs)},
 
       ${JSON.stringify(puppeteerBrowserIgnoreDefaultArgs)}
-    )
+    );
+
+    browser.on('disconnected', () => process.exit());
   `;
 
   pkgEnvDynamicallyGeneratedCommandString += '})();';
