@@ -1,0 +1,35 @@
+{
+  "name": "pkg-web-browser",
+  "version": "1.2.5",
+  "description": "Bundle a browser and a website into an executable file",
+  "main": "dist/index.cjs",
+  "bin": {
+    "pkg-web-browser": "bin/index.cjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/memob0x/pkg-web-browser"
+  },
+  "keywords": [
+    "browser",
+    "pkg",
+    "executable",
+    "bundle",
+    "build",
+    "kiosk",
+    "chrome",
+    "firefox",
+    "inject",
+    "binary"
+  ],
+  "author": "memob0x",
+  "license": "MIT",
+  "dependencies": {
+    "golang": "^0.1.5-stable",
+    "argv": "^0.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.32.0",
+    "eslint-config-airbnb-base": "^15.0.0"
+  }
+}
