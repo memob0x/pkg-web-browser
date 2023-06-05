@@ -8,8 +8,8 @@ Bundle a public website or a local web application to an executable.
 
 ## Dependencies
 
-* [Node](https://nodejs.org/en/download)
-* [Go](https://go.dev/dl/)
+* [Node >= 20](https://nodejs.org/en/download)
+* [Go >= 1.20](https://go.dev/dl/)
 
 ## Installation
 
@@ -45,4 +45,4 @@ pkg-web-browser --arch=amd64
 
 node bin/index.js <https://public-website.net> ./path/to/output/program.exe --os=windows --arch=amd64
 
-node bin/index.js <http://localhost:8080> ./path/to/output/program.exe --os=windows --arch=amd64 --static=./path/to/static/website/
+node bin/index.js localhost:8080 ./path/to/output/program.exe --os=windows --arch=amd64 --static=./path/to/static/website/

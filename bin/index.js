@@ -1,67 +1,23 @@
-/* eslint-disable no-console */
-const { option: argvOption } = require('argv');
-const { exec: childProcExec } = require('child_process');
-const { randomUUID } = require('crypto');
-const { resolve: pathResolve } = require('path');
-const { copy: fsCopy } = require('fs-extra');
-const { rm, mkdir } = require('fs/promises');
-
-const childProcExecAsync = async (command) => new Promise((resolve, reject) => {
-  childProcExec(
-    command,
-
-    (error, stdout, stderr) => {
-      if (error) {
-        reject(new Error(stderr));
-
-        return;
-      }
-
-      resolve(stdout);
-    },
-  );
-});
+import { randomUUID } from 'node:crypto';
+import { copy } from 'fs-extra';
+import { dirname } from 'node:path';
+import childProcessExec from '../lib/child-process-exec.js';
+import parseCliArguments from '../lib/parse-cli-arguments.js';
+import getExecCommandString from '../lib/get-exec-command-string.js';
+import createDisposableDirectory from '../lib/create-disposable-directory.js';
+import getFileAbsolutePath from '../lib/get-file-absolute-path.js';
 
 const {
-  targets,
+  url,
 
-  options,
-} = argvOption([
-  {
-    name: 'os',
-    type: 'string',
-    description: ' ',
-    example: "'pkg-web-browser --os=windows'",
-  },
+  outputPath,
 
-  {
-    name: 'arch',
-    type: 'string',
-    description: ' ',
-    example: "'pkg-web-browser --arch=amd64'",
-  },
-
-  {
-    name: 'static',
-    type: 'string',
-    description: ' ',
-    example: "'pkg-web-browser --static=./path/to/static/'",
-  },
-]).run();
-
-const [
-  url = '',
-
-  binaryFilePath = '.',
-] = targets;
-
-const {
   os,
 
   arch,
 
-  static: embed,
-} = options;
+  staticPath,
+} = parseCliArguments();
 
 if (os) {
   process.env.GOOS = os;
@@ -71,38 +27,42 @@ if (arch) {
   process.env.GOARCH = arch;
 }
 
-const id = randomUUID();
+const baseUrl = import.meta.url;
+
+const rootPath = getFileAbsolutePath(`${dirname(getFileAbsolutePath(baseUrl))}/..`, baseUrl);
+
+const instanceId = randomUUID();
+
+const instanceResourcesPath = getFileAbsolutePath(`${rootPath}resources/${instanceId}`, baseUrl);
 
 (async () => {
-  let command = `go build -ldflags "-X "main.url=${url}" -X "main.id=${id}"`;
+  const deleteInstanceResourcesDirectory = await createDisposableDirectory(instanceResourcesPath);
 
-  if (embed) {
-    command += ` -X "main.static=${embed}"`;
+  if (staticPath) {
+    await copy(
+      getFileAbsolutePath(`${process.cwd()}/${staticPath}`, baseUrl),
 
-    try {
-      await mkdir(pathResolve(__dirname, '..', 'resources', id), {
-        recursive: true,
-      });
-    } catch (e) {
-      console.log(e);
-    }
+      instanceResourcesPath,
 
-    await fsCopy(pathResolve(process.cwd(), embed), pathResolve(__dirname, '..', 'resources', id));
+      {
+        overwrite: true,
+      },
+    );
   }
 
-  command += `" -o ${pathResolve(binaryFilePath)}`;
+  process.chdir(rootPath);
 
-  process.chdir(pathResolve(__dirname, '..'));
+  await childProcessExec(
+    getExecCommandString(
+      instanceId,
 
-  try {
-    console.log(await childProcExecAsync(command));
-  } catch (e) {
-    console.error(e);
-  }
+      url,
 
-  if (embed) {
-    await rm(pathResolve(__dirname, '..', 'resources', id), {
-      recursive: true,
-    });
-  }
+      getFileAbsolutePath(outputPath, baseUrl),
+
+      staticPath,
+    ),
+  );
+
+  await deleteInstanceResourcesDirectory();
 })();
