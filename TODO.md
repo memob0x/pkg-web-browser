@@ -1,10 +1,9 @@
 # TODO
 
-* browser-executable-path arg
-* browser-user-data-dir arg
-* bundle a local web app somehow?
-* bundle the whole web browser somehow?
-* browser-product arg
+* browser-executable-path arg (as download path or existent browser path)
+* browser-user-data-dir arg with LaunchPersistentContext
+* browser-product arg ("firefox" or "chromium" values only)
+
 * browser-revision arg?
 * browser-args arg?
 * browser-ignore-default-args arg?

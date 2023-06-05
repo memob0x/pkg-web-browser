@@ -1,10 +1,10 @@
 {
   "name": "pkg-web-browser",
   "version": "1.2.5",
-  "description": "Bundle a browser and a website into an executable file",
-  "main": "dist/index.cjs",
+  "description": "Bundle a website into an executable file",
+  "main": "bin/index.js",
   "bin": {
-    "pkg-web-browser": "bin/index.cjs"
+    "pkg-web-browser": "bin/index.js"
   },
   "repository": {
     "type": "git",
@@ -25,11 +25,12 @@
   "author": "memob0x",
   "license": "MIT",
   "dependencies": {
-    "golang": "^0.1.5-stable",
-    "argv": "^0.0.3"
+    "argv": "^0.0.3",
+    "fs-extra": "^11.1.1",
+    "golang": "^0.1.5-stable"
   },
   "devDependencies": {
-    "eslint": "^8.32.0",
+    "eslint": "^8.42.0",
     "eslint-config-airbnb-base": "^15.0.0"
   }
 }

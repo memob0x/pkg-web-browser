@@ -42,3 +42,7 @@ To build for a specific architecture:
 ```console
 pkg-web-browser --arch=amd64
 ```
+
+node bin/index.js <https://public-website.net> ./path/to/output/program.exe --os=windows --arch=amd64
+
+node bin/index.js <http://localhost:8080> ./path/to/output/program.exe --os=windows --arch=amd64 --static=./path/to/static/website/

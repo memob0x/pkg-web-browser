@@ -1,13 +1,32 @@
 /* eslint-disable no-console */
-const { option } = require('argv');
-const { exec } = require('child_process');
-const { resolve } = require('path');
+const { option: argvOption } = require('argv');
+const { exec: childProcExec } = require('child_process');
+const { randomUUID } = require('crypto');
+const { resolve: pathResolve } = require('path');
+const { copy: fsCopy } = require('fs-extra');
+const { rm, mkdir } = require('fs/promises');
+
+const childProcExecAsync = async (command) => new Promise((resolve, reject) => {
+  childProcExec(
+    command,
+
+    (error, stdout, stderr) => {
+      if (error) {
+        reject(new Error(stderr));
+
+        return;
+      }
+
+      resolve(stdout);
+    },
+  );
+});
 
 const {
   targets,
 
   options,
-} = option([
+} = argvOption([
   {
     name: 'os',
     type: 'string',
@@ -21,6 +40,13 @@ const {
     description: ' ',
     example: "'pkg-web-browser --arch=amd64'",
   },
+
+  {
+    name: 'static',
+    type: 'string',
+    description: ' ',
+    example: "'pkg-web-browser --static=./path/to/static/'",
+  },
 ]).run();
 
 const [
@@ -33,6 +59,8 @@ const {
   os,
 
   arch,
+
+  static: embed,
 } = options;
 
 if (os) {
@@ -43,18 +71,38 @@ if (arch) {
   process.env.GOARCH = arch;
 }
 
-process.chdir(resolve(__dirname, '..'));
+const id = randomUUID();
 
-exec(
-  `go build -ldflags "-X "main.url=${url}"" -o ${resolve(binaryFilePath)}`,
+(async () => {
+  let command = `go build -ldflags "-X "main.url=${url}" -X "main.id=${id}"`;
 
-  (error, stdout, stderr) => {
-    if (error) {
-      console.error(stderr);
+  if (embed) {
+    command += ` -X "main.static=${embed}"`;
 
-      return;
+    try {
+      await mkdir(pathResolve(__dirname, '..', 'resources', id), {
+        recursive: true,
+      });
+    } catch (e) {
+      console.log(e);
     }
 
-    console.log(stdout);
-  },
-);
+    await fsCopy(pathResolve(process.cwd(), embed), pathResolve(__dirname, '..', 'resources', id));
+  }
+
+  command += `" -o ${pathResolve(binaryFilePath)}`;
+
+  process.chdir(pathResolve(__dirname, '..'));
+
+  try {
+    console.log(await childProcExecAsync(command));
+  } catch (e) {
+    console.error(e);
+  }
+
+  if (embed) {
+    await rm(pathResolve(__dirname, '..', 'resources', id), {
+      recursive: true,
+    });
+  }
+})();
