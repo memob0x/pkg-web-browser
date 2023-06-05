@@ -1,5 +1,10 @@
 {
   "editor.codeActionsOnSave": {
     "source.fixAll": true
+  },
+  "gopls": {
+      "build.buildFlags": [
+          "-tags=static"
+      ]
   }
 }
